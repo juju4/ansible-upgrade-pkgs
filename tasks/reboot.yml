@@ -1,0 +1,23 @@
+---
+
+- name: lxc containers | restart from host
+  debug: msg="You will need to reboot system. restart from container host."
+  when: ansible_virtualization_type == 'lxc'
+
+- name: Need to reboot system but asked not
+  debug: msg="You will need to reboot system. asked ansible not doing it."
+  when: noreboot is defined and noreboot[inventory_hostname]
+
+- block:
+    - name: Reboot system
+      command: /sbin/reboot
+      async: 0
+      poll: 0
+      ignore_errors: true
+
+    - name: waiting for server to come back
+      local_action: wait_for host={{ inventory_hostname }} state=started
+      become: false
+
+  when: not (noreboot is defined and noreboot[inventory_hostname]) and ansible_virtualization_type != 'lxc'
+

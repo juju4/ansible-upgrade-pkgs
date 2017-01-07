@@ -1,0 +1,13 @@
+---
+
+verbose: true
+
+noreboot: # if you want to disable necessary reboot, list systems here
+  host1: true
+vboxguest: # list VM
+  vm1: true
+
+upgrade_aidedb_update: true
+upgrade_forceaide: false
+upgrade_aidedb_rotate: 7
+

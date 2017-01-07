@@ -1,0 +1,34 @@
+---
+
+## will not update software where login to Apple Store is required
+- name: Darwin | check for system upgrade
+  shell: "softwareupdate -l --no-scan"
+  register: darwinsu
+  changed_when: false
+  ignore_errors: true
+- debug: var=darwinsu
+  when: (verbose is defined and verbose)
+
+- block:
+    - name: Darwin | system upgrade
+      shell: "softwareupdate --install --all | tee /tmp/softwareupdate.out"
+      async: 3600
+      poll: 180
+      register: darwinsu2
+    - name: set darwin_updated var
+      set_fact:
+        upgrade_need_hidsupdate: true
+        darwin_updated: true
+  when: darwinsu.stderr.find("No new software available.") == -1
+
+- block:
+    - name: mark for reboot
+      set_fact:
+        upgrade_need_reboot: true
+## add file marker if play is interrupted
+    - name: Darwin | add reboot market
+      file: dest=/tmp/ansible-SYSTEM_NEED_REBOOT state=touch
+  when: (darwinsu2.stdout is defined and darwinsu2.stdout.find("Please restart immediately") != -1)
+
+- include: darwin-macports.yml
+

@@ -1,0 +1,37 @@
+---
+
+#- name: Include version-specific variables for Ubuntu.
+#  include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
+#  when: ansible_os_family == 'Debian'
+#- name: Include version-specific variables for RedHat
+#  include_vars: "RedHat-{{ ansible_distribution_version.split('.')[0] }}.yml"
+#  when: ansible_os_family == 'RedHat'
+- name: Include specific variables per other os family
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: initialize local variables
+  set_fact:
+    upgrade_need_reboot: false
+    upgrade_need_hidsupdate: false
+
+- include: debian.yml
+  when: ansible_os_family == 'Debian'
+
+- include: redhat.yml
+  when: ansible_os_family == 'RedHat'
+
+- include: alpine.yml
+  when: ansible_os_family == 'Alpine'
+
+- include: darwin.yml
+  when: ansible_os_family == 'Darwin'
+
+- include: openbsd.yml
+  when: ansible_os_family == 'OpenBSD'
+
+- include: aide-hids.yml
+  when: (upgrade_need_hidsupdate and upgrade_aidedb_update) or (upgrade_forceaide is defined and upgrade_forceaide)
+
+- include: reboot.yml
+  when: upgrade_need_reboot
+

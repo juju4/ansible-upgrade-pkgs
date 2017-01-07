@@ -1,0 +1,9 @@
+---
+
+- name: OpenBSD | upgrade all packages
+  openbsd_pkg: name=* state=latest
+  tags:
+    - upgrade
+  async: 3600
+  poll: 180
+

@@ -1,0 +1,102 @@
+---
+
+## assess if aide present and current db
+- name: Linux | ensure aide is installed
+  package: name=aide state=present
+  when: ansible_system == "Linux" and ansible_distribution != 'NA' and ansible_os_family != "Alpine"
+- name: check if aide binary is present
+  stat: path={{ aide_bin }}
+  register: hidsaide
+  tags:
+    - aidehids
+- name: check if aide current db is present
+  stat: path={{ aide_db }}
+  register: aidedb
+  tags:
+    - aidehids
+- name: check if aide new db is present
+  stat: path={{ aide_dbnew }}
+  register: aidedbnew
+  tags:
+    - aidehids
+
+
+- name: replacing missing current db with aide.db.new
+  command: "mv {{ aide_dbnew }} {{ aide_db }}"
+  when: hidsaide.stat.exists and not aidedb.stat.exists and aidedbnew.stat.exists
+#- debug: var=ansible_os_family
+
+- block:
+#    - debug: msg="goes on..."
+#    - debug: var=hidsaide
+#    - debug: var=aidedb
+
+    - name: non-darwin | update aide database
+      shell: "{{ item }}"
+      with_items:
+        - "{{ aide_bin }} -u > /tmp/aide.log 2>&1"
+        - "savelog -c {{ upgrade_aidedb_rotate }} aide.db"
+        - "mv {{ aide_dbnew }} {{ aide_db }}"
+      when: hidsaide.stat.exists and (aidedb.stat.exists or aidedbnew.stat.exists)
+      ignore_errors: true       # aide -u
+## aide can be very long but we don't want too long...
+      async: 3600
+      poll: 180
+      tags:
+        - aidehids
+
+    - name: init aide database
+      command: "{{ item }}"
+      with_items:
+        - "{{ aide_bin }} -i"
+        - "mv {{ aide_dbnew }} {{ aide_db }}"
+      when: hidsaide.stat.exists and not aidedb.stat.exists
+      ignore_errors: true       # aide -i
+      tags:
+        - aidehids
+  when: ansible_os_family != "Darwin"
+
+- block:
+    - name: Darwin | update aide database
+      shell: "{{ item }}"
+      with_items:
+        - "{{ aide_bin }} -u > /tmp/aide.log 2>&1"
+        - "for i in `seq 1 {{ upgrade_aidedb_rotate }}`; do n=`expr {{ upgrade_aidedb_rotate }} - $i`; [ -f {{ aide_db }}.$n ] && mv {{ aide_db }}.$n {{ aide_db }}.`expr {{ upgrade_aidedb_rotate }} + 1 - $i`; done"
+        - "mv {{ aide_db }} {{ aide_db }}.0"
+        - "mv {{ aide_dbnew }} {{ aide_db }}"
+      when: hidsaide.stat.exists and (aidedb.stat.exists or aidedbnew.stat.exists) and ansible_os_family == "Darwin" and darwin_updated is defined and darwin_updated
+      ignore_errors: true       # aide -u
+## aide can be very long but we don't want too long...
+      async: 3600
+      poll: 180
+      tags:
+        - aidehids
+
+    - name: Darwin | init aide database
+      command: "{{ item }}"
+      with_items:
+        - "{{ aide_bin }} -i"
+        - "mv {{ aide_dbnew }} {{ aide_db }}"
+      when: hidsaide.stat.exists and not aidedb.stat.exists
+      ignore_errors: true       # aide -i
+      tags:
+        - aidehids
+  when: ansible_os_family == "Darwin"
+
+## in case, aide was updated and file replace
+- stat: path=/etc/cron.daily/.aide-harden-patch
+  register: aidepatch
+- block:
+    - name: copy patch for aide
+      template: src=harden/templates/patch-cron.daily-aide dest=/root/patch-cron.daily-aide mode=0400
+## FIXME! patch module not idempotent so adding file marker
+    - name: Patch cron.daily/aide to rotate database
+      patch: >
+        src=/root/patch-cron.daily-aide
+        dest=/etc/cron.daily/aide
+        remote_src=yes
+        backup=yes
+    - file: dest=/etc/cron.daily/.aide-harden-patch state=touch
+  when: not aidepatch.stat.exists and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+
+

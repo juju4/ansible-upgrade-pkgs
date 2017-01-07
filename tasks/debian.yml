@@ -1,0 +1,81 @@
+---
+
+## FIXME! http://askubuntu.com/questions/441921/why-does-usr-lib-update-notifier-apt-check-not-agree-with-apt-get-upgrade
+- name: Debian | Check if there are packages available to be installed/upgraded
+  command: /usr/lib/update-notifier/apt-check --package-names
+  register: packages
+  changed_when: False
+  ignore_errors: true
+  tags:
+    - upgrade
+
+## https://github.com/ansible/ansible/issues/11601
+## https://github.com/ansible/ansible-modules-core/issues/1741
+## = dist is not enough...
+- name: Debian | upgrade all packages to the latest version (full)
+  apt: upgrade=full update_cache=yes cache_valid_time=3600
+  tags:
+    - upgrade
+  async: 3600
+  poll: 180
+  register: aptf
+
+- name: Debian | upgrade all packages to the latest version (dist)
+  apt: upgrade=dist update_cache=yes cache_valid_time=3600
+  tags:
+    - upgrade
+## FIXME! FAILED! => {"changed": false, "failed": true, "msg": "The async task did not return valid JSON: expected string or buffer"}
+  async: 3600
+  poll: 180
+  register: aptd
+
+- name: apt | Check if packages need to be autoremoved
+  command: apt-get --dry-run autoremove
+  register: check_autoremove
+  changed_when: False
+  ignore_errors: true
+#- debug: var=check_autoremove
+## Note: remote module does not support check mode
+- name: apt | Autoremove unused packages
+  command: apt-get -y autoremove
+  when: check_autoremove.stdout is defined and check_autoremove.stdout.find("packages will be REMOVED") != -1
+#NOK when: check_autoremove.stdout is defined and "'packages will be REMOVED' in check_autoremove.stdout"
+#NOK when: check_autoremove.rc != 0
+  register: aptr
+
+- name: Need HIDS update
+  set_fact:
+    upgrade_need_hidsupdate: true
+  when: aptf.changed or aptd.changed or aptr.changed
+
+- name: Debian | Check if a reboot is required
+  register: file
+  stat: path=/var/run/reboot-required get_md5=no
+  #when: packages.stderr != ""
+  tags:
+    - upgrade
+
+- name: Need to reboot system? yes and will do
+  set_fact:
+    upgrade_need_reboot: true
+  when: file.stat.exists is defined and file.stat.exists == true
+
+- block:
+    - name: check if canonical live patch installed
+      stat: path=/snap/bin/canonical-livepatch
+      register: livepatch
+    - name: is canonical live enabled
+      command: "/snap/bin/canonical-livepatch status"
+      register: livepatchstatus
+      ignore_errors: true
+      changed_when: false
+      when: livepatch.stat.exists
+    - name: Need to reboot system?
+      debug: msg="You will need to reboot system but livepatch is enabled. Do at your leasure :)"
+      when: livepatch.stat.exists and livepatchstatus is defined and livepatchstatus.stdout is defined and livepatchstatus.stdout.find("fully-patched{{ ':' }} true") != -1
+    - set_fact:
+        upgrade_need_reboot: false
+      when: livepatch.stat.exists and livepatchstatus is defined and livepatchstatus.stdout is defined and livepatchstatus.stdout.find("fully-patched{{ ':' }} true") != -1
+  when: file.stat.exists is defined and file.stat.exists == true and ansible_distribution == 'Ubuntu'
+
+

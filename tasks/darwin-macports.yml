@@ -1,0 +1,69 @@
+---
+## FIXME! add support if googlesanta installed and in Lockdown mode... must switch to monitor during upgrade
+
+## FIXME! not supported
+#- name: Darwin | macports upgrade
+#  macports: name=* present=latest
+#  when: ansible_os_family == "Darwin"
+- name: Darwin | macports port selfupdate dryrun
+  shell: "/opt/local/bin/port -yv selfupdate --nosync"
+  register: darwinmpsu0
+  changed_when: false
+  ignore_errors: true
+  async: 1800
+  poll: 180
+- debug: var=darwinmpsu0
+  when: (verbose is defined and verbose)
+
+- block:
+    - name: Darwin | macports port selfupdate
+      shell: "/opt/local/bin/port selfupdate"
+      register: darwinmpsu
+    - debug: var=darwinmpsu
+      when: (verbose is defined and verbose)
+    - name: set darwin_updated var
+      set_fact:
+        darwin_updated: true
+        upgrade_need_hidsupdate: true
+  when: (darwinmpsu0.stdout.find("MacPorts base is already the latest version") == -1)
+#  when: (darwinmpsu0.stdout.find("MacPorts base is already the latest version") != -1 or darwinmpsu0.stdout.find("Total number of ports parsed{{ ':' }}\t0") != -1)
+
+
+- name: Darwin | check for outdated macports
+  shell: "/opt/local/bin/port outdated"
+  register: darwinmp
+  ignore_errors: true
+  changed_when: false
+- debug: var=darwinmp
+  when: (verbose is defined and verbose)
+- block:
+    - name: Darwin | macports port outdated upgrade
+      shell: "/opt/local/bin/port upgrade outdated "
+      register: darwinmp2
+    - name: set darwin_updated var
+      set_fact:
+        darwin_updated: true
+        upgrade_need_hidsupdate: true
+#  when: darwinmp.stderr.find("No installed ports are outdated.") != -1   #NOK. never happening
+#  when: darwinmp.stderr.find("No installed ports are outdated.") == -1   #NOK. happening all times / FIXME!
+  when: darwinmp.stderr.find("No installed ports are outdated.") == -1
+
+- name: Darwin | check for inactive macports
+  command: "/opt/local/bin/port inactive"
+  register: darwinmpi
+  ignore_errors: true
+  changed_when: false
+- debug: var=darwinmpi
+  when: (verbose is defined and verbose)
+- block:
+    - name: Darwin | macports uninstall inactive
+      shell: "/opt/local/bin/port uninstall inactive"
+      register: darwinmpi2
+    - name: set darwin_updated var
+      set_fact:
+        darwin_updated: true
+        upgrade_need_hidsupdate: true
+  when: darwinmpi.stderr.find("None of the specified ports are installed.") == -1
+
+## FIXME! port uninstall inactive (previous versions), port uninstall leaves (~autoremove?)
+
