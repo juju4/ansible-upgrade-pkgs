@@ -88,7 +88,7 @@
   register: aidepatch
 - block:
     - name: copy patch for aide
-      template: src=harden/templates/patch-cron.daily-aide dest=/root/patch-cron.daily-aide mode=0400
+      template: src=patch-cron.daily-aide dest=/root/patch-cron.daily-aide mode=0400
 ## FIXME! patch module not idempotent so adding file marker
     - name: Patch cron.daily/aide to rotate database
       patch: >
