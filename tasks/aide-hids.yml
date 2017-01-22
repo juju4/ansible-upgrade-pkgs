@@ -35,7 +35,7 @@
       shell: "{{ item }}"
       with_items:
         - "{{ aide_bin }} -u > /tmp/aide.log 2>&1"
-        - "savelog -c {{ upgrade_aidedb_rotate }} aide.db"
+        - "savelog -c {{ upgrade_aidedb_rotate }} {{ aide_db }}"
         - "mv {{ aide_dbnew }} {{ aide_db }}"
       when: hidsaide.stat.exists and (aidedb.stat.exists or aidedbnew.stat.exists)
       ignore_errors: true       # aide -u

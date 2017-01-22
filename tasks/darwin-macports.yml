@@ -16,6 +16,10 @@
   when: (verbose is defined and verbose)
 
 - block:
+    - name: Google Santa | ensure config set to monitor mode
+      osx_defaults: domain=/var/db/santa/config.plist key=ClientMode value='MONITOR'
+      when: (harden_darwin_santa_mode == 'LOCKDOWN' or harden_darwin_santa_mode == 2)
+
     - name: Darwin | macports port selfupdate
       shell: "/opt/local/bin/port selfupdate"
       register: darwinmpsu
@@ -27,7 +31,15 @@
         upgrade_need_hidsupdate: true
   when: (darwinmpsu0.stdout.find("MacPorts base is already the latest version") == -1)
 #  when: (darwinmpsu0.stdout.find("MacPorts base is already the latest version") != -1 or darwinmpsu0.stdout.find("Total number of ports parsed{{ ':' }}\t0") != -1)
+  always:
+    - name: Google Santa | ensure config set to lockdown mode
+      osx_defaults: domain=/var/db/santa/config.plist key=ClientMode value={{ harden_darwin_santa_mode }}
+      when: (harden_darwin_santa_mode == 'LOCKDOWN' or harden_darwin_santa_mode == 2)
 
+## No option to do a dryrun sync
+- name: Darwin | macports sync
+  shell: "/opt/local/bin/port sync"
+  ignore_errors: true
 
 - name: Darwin | check for outdated macports
   shell: "/opt/local/bin/port outdated"
@@ -37,6 +49,10 @@
 - debug: var=darwinmp
   when: (verbose is defined and verbose)
 - block:
+    - name: Google Santa | ensure config set to monitor mode
+      osx_defaults: domain=/var/db/santa/config.plist key=ClientMode value='MONITOR'
+      when: (harden_darwin_santa_mode == 'LOCKDOWN' or harden_darwin_santa_mode == 2)
+
     - name: Darwin | macports port outdated upgrade
       shell: "/opt/local/bin/port upgrade outdated "
       register: darwinmp2
@@ -44,21 +60,26 @@
       set_fact:
         darwin_updated: true
         upgrade_need_hidsupdate: true
-#  when: darwinmp.stderr.find("No installed ports are outdated.") != -1   #NOK. never happening
-#  when: darwinmp.stderr.find("No installed ports are outdated.") == -1   #NOK. happening all times / FIXME!
-  when: darwinmp.stderr.find("No installed ports are outdated.") == -1
+  when: not ("No installed ports are outdated." in darwinmp.stdout)
+  always:
+    - name: Google Santa | ensure config set to lockdown mode
+      osx_defaults: domain=/var/db/santa/config.plist key=ClientMode value={{ harden_darwin_santa_mode }}
+      when: (harden_darwin_santa_mode == 'LOCKDOWN' or harden_darwin_santa_mode == 2)
+## FIXME! need to regenerate hash whitelist for updated ports...
 
 - name: Darwin | check for inactive macports
-  command: "/opt/local/bin/port inactive"
+  command: "/opt/local/bin/port installed inactive"
   register: darwinmpi
   ignore_errors: true
   changed_when: false
+
 - debug: var=darwinmpi
   when: (verbose is defined and verbose)
 - block:
     - name: Darwin | macports uninstall inactive
       shell: "/opt/local/bin/port uninstall inactive"
       register: darwinmpi2
+      ignore_errors: true
     - name: set darwin_updated var
       set_fact:
         darwin_updated: true
@@ -66,4 +87,5 @@
   when: darwinmpi.stderr.find("None of the specified ports are installed.") == -1
 
 ## FIXME! port uninstall inactive (previous versions), port uninstall leaves (~autoremove?)
+
 

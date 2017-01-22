@@ -12,6 +12,8 @@
 ## https://github.com/ansible/ansible/issues/11601
 ## https://github.com/ansible/ansible-modules-core/issues/1741
 ## = dist is not enough...
+## Note: some upgrade can fail if /run is full/too small.
+##      => mount -o remount,size=200m /run
 - name: Debian | upgrade all packages to the latest version (full)
   apt: upgrade=full update_cache=yes cache_valid_time=3600
   tags:
@@ -51,7 +53,6 @@
 - name: Debian | Check if a reboot is required
   register: file
   stat: path=/var/run/reboot-required get_md5=no
-  #when: packages.stderr != ""
   tags:
     - upgrade
 
@@ -78,4 +79,6 @@
       when: livepatch.stat.exists and livepatchstatus is defined and livepatchstatus.stdout is defined and livepatchstatus.stdout.find("fully-patched{{ ':' }} true") != -1
   when: file.stat.exists is defined and file.stat.exists == true and ansible_distribution == 'Ubuntu'
 
+
+- debug: var=upgrade_need_reboot
 

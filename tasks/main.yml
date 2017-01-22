@@ -32,6 +32,7 @@
 - include: aide-hids.yml
   when: (upgrade_need_hidsupdate and upgrade_aidedb_update) or (upgrade_forceaide is defined and upgrade_forceaide)
 
+- debug: var=upgrade_need_reboot
 - include: reboot.yml
   when: upgrade_need_reboot
 
