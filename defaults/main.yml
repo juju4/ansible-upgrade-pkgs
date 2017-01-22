@@ -4,6 +4,8 @@ verbose: true
 
 noreboot: # if you want to disable necessary reboot, list systems here
   host1: true
+## to disable reboot in all case
+noreboot_all: false
 vboxguest: # list VM
   vm1: true
 

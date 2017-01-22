@@ -1,5 +1,11 @@
 ---
 
+- name: Debian | ensure appropriate packages are present
+  apt: name={{ item }} state=present
+  with_items:
+    - update-notifier-common
+    - aptitude
+
 ## FIXME! http://askubuntu.com/questions/441921/why-does-usr-lib-update-notifier-apt-check-not-agree-with-apt-get-upgrade
 - name: Debian | Check if there are packages available to be installed/upgraded
   command: /usr/lib/update-notifier/apt-check --package-names

@@ -2,8 +2,8 @@
 
 - hosts: all
 #- hosts: test-kitchen
-#  vars:
-#    - a:
+  vars:
+    - noreboot_all: true
   roles:
     - juju4.upgrade-pkgs
 
