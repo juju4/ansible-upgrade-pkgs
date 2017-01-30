@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/juju4/ansible-upgrade-pkgs.svg?branch=master)](https://travis-ci.org/juju4/ansible-upgrade-pkgs)
+[![Build Status - Master](https://travis-ci.org/juju4/ansible-upgrade-pkgs.svg?branch=master)](https://travis-ci.org/juju4/ansible-upgrade-pkgs)
+[![Build Status - Devel](https://travis-ci.org/juju4/ansible-upgrade-pkgs.svg?branch=devel)](https://travis-ci.org/juju4/ansible-upgrade-pkgs/branches)
 # upgrade-pkgs ansible role
 
 Ansible role to do upgrade system with packaging system
