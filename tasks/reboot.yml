@@ -13,7 +13,9 @@
     - name: Reboot system
 ## Note: in some case, reboot froze ansible play
       #command: /sbin/reboot
-      command: /sbin/shutdown --reboot +1
+## --reboot option is only available on ubuntu xenial/16.04+, not trusty/14.04
+#      command: /sbin/shutdown --reboot +1
+      command: /sbin/shutdown -r +1
       async: 0
       poll: 0
       ignore_errors: true

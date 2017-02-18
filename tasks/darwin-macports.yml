@@ -84,7 +84,7 @@
       set_fact:
         darwin_updated: true
         upgrade_need_hidsupdate: true
-  when: darwinmpi.stderr.find("None of the specified ports are installed.") == -1
+  when: darwinmpi.stderr is defined and darwinmpi.stderr.find("None of the specified ports are installed.") == -1
 
 ## FIXME! port uninstall inactive (previous versions), port uninstall leaves (~autoremove?)
 
