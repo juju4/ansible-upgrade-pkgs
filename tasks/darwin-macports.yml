@@ -17,8 +17,8 @@
 
 - block:
     - name: Google Santa | ensure config set to monitor mode
-      osx_defaults: domain=/var/db/santa/config.plist key=ClientMode value='MONITOR'
-      when: (harden_darwin_santa_mode == 'LOCKDOWN' or harden_darwin_santa_mode == 2)
+      osx_defaults: domain=/var/db/santa/config.plist key=ClientMode value=0 type=int
+      when: (harden_darwin_santa_mode == 'LOCKDOWN' or harden_darwin_santa_mode == 2) and upgradepkgs_darwin_santa_temporary_monitor
 
     - name: Darwin | macports port selfupdate
       shell: "/opt/local/bin/port selfupdate"
@@ -33,8 +33,8 @@
 #  when: (darwinmpsu0.stdout.find("MacPorts base is already the latest version") != -1 or darwinmpsu0.stdout.find("Total number of ports parsed{{ ':' }}\t0") != -1)
   always:
     - name: Google Santa | ensure config set to lockdown mode
-      osx_defaults: domain=/var/db/santa/config.plist key=ClientMode value={{ harden_darwin_santa_mode }}
-      when: (harden_darwin_santa_mode == 'LOCKDOWN' or harden_darwin_santa_mode == 2)
+      osx_defaults: domain=/var/db/santa/config.plist key=ClientMode value={{ harden_darwin_santa_mode }} type=int
+      when: (harden_darwin_santa_mode == 'LOCKDOWN' or harden_darwin_santa_mode == 2) and upgradepkgs_darwin_santa_temporary_monitor
 
 ## No option to do a dryrun sync
 - name: Darwin | macports sync
@@ -50,8 +50,8 @@
   when: (verbose is defined and verbose)
 - block:
     - name: Google Santa | ensure config set to monitor mode
-      osx_defaults: domain=/var/db/santa/config.plist key=ClientMode value='MONITOR'
-      when: (harden_darwin_santa_mode == 'LOCKDOWN' or harden_darwin_santa_mode == 2)
+      osx_defaults: domain=/var/db/santa/config.plist key=ClientMode value=0 type=int
+      when: (harden_darwin_santa_mode == 'LOCKDOWN' or harden_darwin_santa_mode == 2) and upgradepkgs_darwin_santa_temporary_monitor
 
     - name: Darwin | macports port outdated upgrade
       shell: "/opt/local/bin/port upgrade outdated "
@@ -63,8 +63,8 @@
   when: not ("No installed ports are outdated." in darwinmp.stdout)
   always:
     - name: Google Santa | ensure config set to lockdown mode
-      osx_defaults: domain=/var/db/santa/config.plist key=ClientMode value={{ harden_darwin_santa_mode }}
-      when: (harden_darwin_santa_mode == 'LOCKDOWN' or harden_darwin_santa_mode == 2)
+      osx_defaults: domain=/var/db/santa/config.plist key=ClientMode value={{ harden_darwin_santa_mode }} type=int
+      when: (harden_darwin_santa_mode == 'LOCKDOWN' or harden_darwin_santa_mode == 2) and upgradepkgs_darwin_santa_temporary_monitor
 ## FIXME! need to regenerate hash whitelist for updated ports...
 
 - name: Darwin | check for inactive macports

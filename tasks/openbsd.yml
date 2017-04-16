@@ -1,5 +1,7 @@
 ---
 
+## OpenBSD 6.1/amd64: syspatch can be used to apply binary updates, https://www.openbsd.org/errata61.html
+
 - name: OpenBSD | upgrade all packages
   openbsd_pkg: name=* state=latest
   tags:
