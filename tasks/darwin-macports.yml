@@ -75,6 +75,7 @@
 
 - debug: var=darwinmpi
   when: (verbose is defined and verbose)
+## FIXME! to still allow rollback, would need an inactive minus 1/n back
 - block:
     - name: Darwin | macports uninstall inactive
       shell: "/opt/local/bin/port uninstall inactive"
@@ -86,6 +87,6 @@
         upgrade_need_hidsupdate: true
   when: darwinmpi.stderr is defined and darwinmpi.stderr.find("None of the specified ports are installed.") == -1
 
-## FIXME! port uninstall inactive (previous versions), port uninstall leaves (~autoremove?)
+## FIXME! port uninstall leaves (~autoremove?)
 
 

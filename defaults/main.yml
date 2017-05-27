@@ -13,5 +13,7 @@ upgrade_aidedb_update: true
 upgrade_forceaide: false
 upgrade_aidedb_rotate: 7
 
-upgradepkgs_darwin_santa_temporary_monitor: false
+upgradepkgs_darwin_santa_temporary_monitor: true
+## NOK
+#upgradepkgs_darwin_santa_temporary_monitor: false
 
