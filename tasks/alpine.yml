@@ -3,9 +3,13 @@
 - name: Alpine | upgrade all packages
 ## FIXME! not idempotent, always return changed and not doing all upgrade
 ## FIXME! not done upgrading...
-  apk: upgrade=yes update_cache=yes
+#  apk: upgrade=yes update_cache=yes
 ## FAILED! => {"changed": false, "failed": true, "invocation": {"module_args": {"name": null, "state": "present", "update_cache": false, "upgrade": true}, "module_name": "apk"}, "msg": "failed to upgrade packages"}
 #  apk: upgrade=yes
+  command: "{{ item }}"
+  with_items:
+    - apk update
+    - apk upgrade
   tags:
     - upgrade
 #  async: 3600
