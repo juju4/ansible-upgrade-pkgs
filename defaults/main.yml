@@ -13,7 +13,11 @@ upgrade_aidedb_update: true
 upgrade_forceaide: false
 upgrade_aidedb_rotate: 7
 
+upgradepkgs_darwinmp_remove_inactive: false
+
 upgradepkgs_darwin_santa_temporary_monitor: true
 ## NOK
 #upgradepkgs_darwin_santa_temporary_monitor: false
-upgradepkgs_darwinmp_remove_inactive: false
+
+harden_darwin_santa_db_type: string
+#harden_darwin_santa_db_type: int
