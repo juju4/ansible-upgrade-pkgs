@@ -13,10 +13,11 @@ If reboot is needed, it will be done unless flagged noreboot or if ubuntu livepa
 ### Ansible
 It was tested on the following versions:
  * 2.2
+ * 2.5
 
 ### Operating systems
 
-Ubuntu 14.04, 16.04 and Centos7
+Ubuntu 14.04, 16.04, 18.04 and Centos7
 
 ## Example Playbook
 
