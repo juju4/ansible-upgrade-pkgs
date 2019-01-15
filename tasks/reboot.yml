@@ -8,7 +8,8 @@
   debug: msg="You will need to reboot system. asked ansible not doing it."
   when: noreboot is defined and noreboot[inventory_hostname]
 
-#- debug: var="{{ not (noreboot is defined and noreboot[inventory_hostname] is defined and noreboot[inventory_hostname]) and ansible_virtualization_type != 'lxc' }}"
+#- debug: var="{{ not (noreboot is defined and noreboot[inventory_hostname] is defined and
+#              noreboot[inventory_hostname]) and ansible_virtualization_type != 'lxc' }}"
 - block:
     - name: Reboot system
 ## Note: in some case, reboot froze ansible play
@@ -21,7 +22,8 @@
       ignore_errors: true
 
     - name: waiting for server to come back
-      local_action: wait_for host={{ inventory_hostname }} state=started
+      wait_for: host={{ inventory_hostname }} state=started
+      delegate_to: localhost
       become: false
 
   when: >

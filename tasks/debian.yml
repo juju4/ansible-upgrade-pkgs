@@ -35,7 +35,8 @@
   apt: upgrade=dist update_cache=yes cache_valid_time=3600
   tags:
     - upgrade
-## FIXME! FAILED! => {"changed": false, "failed": true, "msg": "The async task did not return valid JSON: expected string or buffer"}
+## FIXME! FAILED! => {"changed": false, "failed": true,
+#       "msg": "The async task did not return valid JSON: expected string or buffer"}
   async: 3600
   poll: 180
   register: aptd
@@ -69,7 +70,7 @@
 - name: Need to reboot system? yes and will do
   set_fact:
     upgrade_need_reboot: true
-  when: file.stat.exists is defined and file.stat.exists == true
+  when: file.stat.exists is defined and file.stat.exists
 
 - block:
     - name: check if canonical live patch installed
@@ -87,7 +88,8 @@
         livepatch.stat.exists and livepatchstatus is defined and
         livepatchstatus.stdout is defined and
         livepatchstatus.stdout.find("fully-patched{{ ':' }} true") != -1
-    - set_fact:
+    - name: Set fact upgrade_need_reboot
+      set_fact:
         upgrade_need_reboot: false
       when: >
         livepatch.stat.exists and livepatchstatus is defined and

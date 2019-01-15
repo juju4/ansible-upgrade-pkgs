@@ -62,9 +62,12 @@
     - name: Darwin | update aide database
       shell: "{{ item }}"
       with_items:
-        - "[ -f /opt/local/var/log/aide/aide.log ] && mv /opt/local/var/log/aide/aide.log /opt/local/var/log/aide/aide.log.0"
+        - "[ -f /opt/local/var/log/aide/aide.log ] && mv /opt/local/var/log/aide/aide.log
+           /opt/local/var/log/aide/aide.log.0"
         - "{{ aide_bin }} -u > /opt/local/var/log/aide/aide.log 2>&1"
-        - "for i in `seq 1 {{ upgrade_aidedb_rotate }}`; do n=`expr {{ upgrade_aidedb_rotate }} - $i`; [ -f {{ aide_db }}.$n ] && mv {{ aide_db }}.$n {{ aide_db }}.`expr {{ upgrade_aidedb_rotate }} + 1 - $i`; done"
+        - "for i in `seq 1 {{ upgrade_aidedb_rotate }}`; do n=`expr {{ upgrade_aidedb_rotate }} - $i`;
+           [ -f {{ aide_db }}.$n ] &&
+           mv {{ aide_db }}.$n {{ aide_db }}.`expr {{ upgrade_aidedb_rotate }} + 1 - $i`; done"
         - "mv {{ aide_db }} {{ aide_db }}.0"
         - "mv {{ aide_dbnew }} {{ aide_db }}"
       when: >
