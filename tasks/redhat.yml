@@ -7,6 +7,7 @@
   async: 3600
   poll: 180
   register: yumu
+  until: yumu is success
 
 - name: Need HIDS update
   set_fact:

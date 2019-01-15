@@ -8,3 +8,5 @@
     - upgrade
   async: 3600
   poll: 180
+  register: pkg_result
+  until: pkg_result is success

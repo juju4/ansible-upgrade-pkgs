@@ -4,6 +4,8 @@
 - name: Linux | ensure aide is installed
   package: name=aide state=present
   when: ansible_system == "Linux" and ansible_distribution != 'NA' and ansible_os_family != "Alpine"
+  register: pkg_result
+  until: pkg_result is success
 - name: check if aide binary is present
   stat: path={{ aide_bin }}
   register: hidsaide

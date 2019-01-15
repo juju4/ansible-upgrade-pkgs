@@ -5,6 +5,8 @@
   with_items:
     - update-notifier-common
     - aptitude
+  register: pkg_result
+  until: pkg_result is success
 
 ## FIXME! http://askubuntu.com/questions/441921/why-does-usr-lib-update-notifier-apt-check-not-agree-with-apt-get-upgrade
 - name: Debian | Check if there are packages available to be installed/upgraded
@@ -27,6 +29,7 @@
   async: 3600
   poll: 180
   register: aptf
+  until: aptf is success
 
 - name: Debian | upgrade all packages to the latest version (dist)
   apt: upgrade=dist update_cache=yes cache_valid_time=3600
@@ -36,6 +39,7 @@
   async: 3600
   poll: 180
   register: aptd
+  until: aptd is success
 
 - name: apt | Check if packages need to be autoremoved
   command: apt-get --dry-run autoremove
