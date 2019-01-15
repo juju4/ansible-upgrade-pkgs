@@ -89,7 +89,8 @@
   when: ansible_os_family == "Darwin"
 
 ## in case, aide was updated and file replace
-- stat: path=/etc/cron.daily/.aide-harden-patch
+- name: Check if aide cron has already been patched
+  stat: path=/etc/cron.daily/.aide-harden-patch
   register: aidepatch
 - block:
     - name: copy patch for aide
@@ -101,5 +102,6 @@
         dest=/etc/cron.daily/aide
         remote_src=yes
         backup=yes
-    - file: dest=/etc/cron.daily/.aide-harden-patch state=touch
+    - name: Set marker for aide cron patch
+      file: dest=/etc/cron.daily/.aide-harden-patch state=touch
   when: not aidepatch.stat.exists and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
