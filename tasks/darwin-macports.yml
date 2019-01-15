@@ -22,7 +22,9 @@
         key: ClientMode
         value: 0
         type: "{{ harden_darwin_santa_db_type }}"
-      when: (harden_darwin_santa_mode == 'LOCKDOWN' or harden_darwin_santa_mode == 2) and upgradepkgs_darwin_santa_temporary_monitor
+      when: >
+        (harden_darwin_santa_mode == 'LOCKDOWN' or harden_darwin_santa_mode == 2) and
+        upgradepkgs_darwin_santa_temporary_monitor
 
     - name: Darwin | macports port selfupdate
       shell: "/opt/local/bin/port selfupdate"
@@ -34,7 +36,6 @@
         darwin_updated: true
         upgrade_need_hidsupdate: true
   when: (darwinmpsu0.stdout.find("MacPorts base is already the latest version") == -1)
-#  when: (darwinmpsu0.stdout.find("MacPorts base is already the latest version") != -1 or darwinmpsu0.stdout.find("Total number of ports parsed{{ ':' }}\t0") != -1)
   always:
     - name: Google Santa | ensure config set to lockdown mode
       osx_defaults:
@@ -42,7 +43,9 @@
         key: ClientMode
         value: "{{ harden_darwin_santa_mode }}"
         type: "{{ harden_darwin_santa_db_type }}"
-      when: (harden_darwin_santa_mode == 'LOCKDOWN' or harden_darwin_santa_mode == 2) and upgradepkgs_darwin_santa_temporary_monitor
+      when: >
+        (harden_darwin_santa_mode == 'LOCKDOWN' or harden_darwin_santa_mode == 2) and
+        upgradepkgs_darwin_santa_temporary_monitor
 
 ## No option to do a dryrun sync
 - name: Darwin | macports sync
@@ -63,7 +66,9 @@
         key: ClientMode
         value: 0
         type: "{{ harden_darwin_santa_db_type }}"
-      when: (harden_darwin_santa_mode == 'LOCKDOWN' or harden_darwin_santa_mode == 2) and upgradepkgs_darwin_santa_temporary_monitor
+      when: >
+        (harden_darwin_santa_mode == 'LOCKDOWN' or harden_darwin_santa_mode == 2) and
+        upgradepkgs_darwin_santa_temporary_monitor
 
     - name: Darwin | macports port outdated upgrade
       shell: "/opt/local/bin/port upgrade outdated "
@@ -80,7 +85,9 @@
         key: ClientMode
         value: "{{ harden_darwin_santa_mode }}"
         type: "{{ harden_darwin_santa_db_type }}"
-      when: (harden_darwin_santa_mode == 'LOCKDOWN' or harden_darwin_santa_mode == 2) and upgradepkgs_darwin_santa_temporary_monitor
+      when: >
+        (harden_darwin_santa_mode == 'LOCKDOWN' or harden_darwin_santa_mode == 2) and
+        upgradepkgs_darwin_santa_temporary_monitor
 ## FIXME! need to regenerate hash whitelist for updated ports...
 
 - name: Darwin | check for inactive macports
@@ -101,8 +108,9 @@
       set_fact:
         darwin_updated: true
         upgrade_need_hidsupdate: true
-  when: darwinmpi.stderr is defined and darwinmpi.stderr.find("None of the specified ports are installed.") == -1 and upgradepkgs_darwinmp_remove_inactive
+  when: >
+    darwinmpi.stderr is defined and
+    darwinmpi.stderr.find("None of the specified ports are installed.") == -1 and
+    upgradepkgs_darwinmp_remove_inactive
 
 ## FIXME! port uninstall leaves (~autoremove?)
-
-

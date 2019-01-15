@@ -24,5 +24,6 @@
       local_action: wait_for host={{ inventory_hostname }} state=started
       become: false
 
-  when: not (noreboot is defined and noreboot[inventory_hostname] is defined and noreboot[inventory_hostname]) and ansible_virtualization_type != 'lxc'
-
+  when: >
+    not (noreboot is defined and noreboot[inventory_hostname] is defined and noreboot[inventory_hostname]) and
+    ansible_virtualization_type != 'lxc'

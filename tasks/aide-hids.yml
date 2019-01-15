@@ -65,7 +65,9 @@
         - "for i in `seq 1 {{ upgrade_aidedb_rotate }}`; do n=`expr {{ upgrade_aidedb_rotate }} - $i`; [ -f {{ aide_db }}.$n ] && mv {{ aide_db }}.$n {{ aide_db }}.`expr {{ upgrade_aidedb_rotate }} + 1 - $i`; done"
         - "mv {{ aide_db }} {{ aide_db }}.0"
         - "mv {{ aide_dbnew }} {{ aide_db }}"
-      when: hidsaide.stat.exists and (aidedb.stat.exists or aidedbnew.stat.exists) and ansible_os_family == "Darwin" and darwin_updated is defined and darwin_updated
+      when: >
+        hidsaide.stat.exists and (aidedb.stat.exists or aidedbnew.stat.exists) and
+        ansible_os_family == "Darwin" and darwin_updated is defined and darwin_updated
       ignore_errors: true       # aide -u
 ## aide can be very long but we don't want too long...
       async: 3600
@@ -99,5 +101,3 @@
         backup=yes
     - file: dest=/etc/cron.daily/.aide-harden-patch state=touch
   when: not aidepatch.stat.exists and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
-
-

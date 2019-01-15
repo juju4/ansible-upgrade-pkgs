@@ -5,5 +5,4 @@
   vars:
     - noreboot_all: true
   roles:
-    - juju4.upgrade-pkgs
-
+    - juju4.upgrade_pkgs

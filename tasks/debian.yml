@@ -79,12 +79,16 @@
       when: livepatch.stat.exists
     - name: Need to reboot system?
       debug: msg="You will need to reboot system but livepatch is enabled. Do at your leasure :)"
-      when: livepatch.stat.exists and livepatchstatus is defined and livepatchstatus.stdout is defined and livepatchstatus.stdout.find("fully-patched{{ ':' }} true") != -1
+      when: >
+        livepatch.stat.exists and livepatchstatus is defined and
+        livepatchstatus.stdout is defined and
+        livepatchstatus.stdout.find("fully-patched{{ ':' }} true") != -1
     - set_fact:
         upgrade_need_reboot: false
-      when: livepatch.stat.exists and livepatchstatus is defined and livepatchstatus.stdout is defined and livepatchstatus.stdout.find("fully-patched{{ ':' }} true") != -1
+      when: >
+        livepatch.stat.exists and livepatchstatus is defined and
+        livepatchstatus.stdout is defined and
+        livepatchstatus.stdout.find("fully-patched{{ ':' }} true") != -1
   when: file.stat.exists is defined and file.stat.exists == true and ansible_distribution == 'Ubuntu'
 
-
 - debug: var=upgrade_need_reboot
-

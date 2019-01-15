@@ -8,4 +8,3 @@
     - upgrade
   async: 3600
   poll: 180
-

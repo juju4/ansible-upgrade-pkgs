@@ -35,4 +35,3 @@
 - debug: var=upgrade_need_reboot
 - include: reboot.yml
   when: upgrade_need_reboot and not noreboot_all
-

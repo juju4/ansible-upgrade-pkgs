@@ -18,7 +18,11 @@
 ## http://stackoverflow.com/questions/22597424/ansible-detect-changes-in-certain-files-after-yum-update-and-do-a-reboot
 - name: Check for reboot hint.
   #shell: if [ $(readlink -f /vmlinuz) != /boot/vmlinuz-$(uname -r) ]; then echo 'reboot'; else echo 'no'; fi
-  shell: if [ "`rpm -q kernel --queryformat '%{installtime} %{version}-%{release}.%{arch}\n' | sort -n -k1 | tail -1 | cut -d ' ' -f 2`" = "`uname -r`" ]; then echo "no"; else echo "reboot"; fi
+  shell: >
+    if [ "`rpm -q kernel --queryformat '%{installtime} %{version}-%{release}.%{arch}\n' |
+        sort -n -k1 | tail -1 | cut -d ' ' -f 2`" = "`uname -r`" ]; then
+        echo "no"; else echo "reboot";
+    fi
   ignore_errors: true
   register: reboot_hint
   when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
@@ -27,4 +31,3 @@
   set_fact:
     upgrade_need_reboot: true
   when: reboot_hint.stdout.find("reboot") != -1
-
