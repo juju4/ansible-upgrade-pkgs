@@ -4,23 +4,25 @@
 ## https://github.com/BTBurke/skeleton-vagrant-ansible/blob/master/provisioning/vboxadditions.yaml
 
 - name: host | check if Virtualbox installed
-  local_action: stat path=/usr/bin/virtualbox
+  stat: path=/usr/bin/virtualbox
+  delegate_to: localhost
   register: localvbox
   become: no
 #- debug: var=localvbox
 - name: Find Host Virtualbox Version
   become: no
-  local_action: shell virtualbox -h | awk '/Oracle VM VirtualBox Manager/ {split($0,a," "); print a[5]}'
+  shell: virtualbox -h | awk '/Oracle VM VirtualBox Manager/ {split($0,a," "); print a[5]}'
+  delegate_to: localhost
   #local_action: shell "virtualbox -h | awk '/Oracle VM VirtualBox Manager/ {split($0,a,\" \"); print a[5]}'" # NOK
   register: hostV
   when: localvbox.stat.exists
   changed_when: False
-    
+
 - name: Find Guest Additions Version
   shell: "modinfo vboxguest | awk '/^version:/ { print $2 }'"
   register: guestV
   changed_when: False
-    
+
 - debug: var=hostV
   when: (verbose is defined and verbose)
 - debug: var=guestV
@@ -43,7 +45,7 @@
   when: >
     hostV is defined and hostV.stdout and guestV is defined and guestV.stdout and
     hostV.stdout != guestV.stdout and not vboxguestadditions.stat.exists
-    
+
 - stat: path="{{ isodir }}/VBoxGuestAdditions_{{ hostV.stdout }}.iso"
   register: vboxguestadditions
     #      when: vboxguest is defined and vboxguest and hostV.stdout is defined
@@ -54,11 +56,12 @@
   when: >
     hostV is defined and hostV.stdout and guestV is defined and guestV.stdout and
     hostV.stdout != guestV.stdout and vboxguestadditions.stat.exists
-    
+
 ## as role/harden protection
 - stat: path=/etc/apt/apt.conf.d/99security
   register: hardenapt
-- command: "chattr -R -i /lib"
+- name: remove immutable tag from /lib directory
+  command: "chattr -R -i /lib"
   ignore_errors: true
   when: >
     hardenapt.stat.exists and
@@ -72,12 +75,13 @@
     hostV is defined and hostV.stdout and guestV is defined and guestV.stdout and
     hostV.stdout != guestV.stdout
   become: yes
-  ignore_errors: yes  # Need to ignore errors here because no windowing system is installed on server image.  No way to override. 
+  ignore_errors: yes  # Need to ignore errors here because no windowing system is installed on server image.  No way to override.
 - name: Ensure virtualbox module is build for latest kernel
   command: /sbin/rcvboxdrv setup
   become: yes
   when: virtualbox_host is defined and virtualbox_host
-- command: "chattr -R +i /lib"
+- name: set immutable tag from /lib directory
+  command: "chattr -R +i /lib"
   ignore_errors: true
   when: >
     hardenapt.stat.exists and
@@ -85,17 +89,17 @@
       guestV.stdout and hostV.stdout != guestV.stdout) or
       (virtualbox_host is defined and virtualbox_host)
     )
-    
+
     #    - name: Halting the VM since Guest Additions Updated
     #      local_action: command vagrant halt
     #      become: no
     #      when: hostV.stdout != guestV.stdout
-    
+
     #    - name: Restarting the VM without provisioning
     #      local_action: command vagrant up --no-provision
     #      become: no
     #      when: hostV.stdout != guestV.stdout
-    
+
 - name: apt | Mark VM for reboot since Guest Additions Updated
   file: path=/var/run/reboot-required state=touch
   when: >

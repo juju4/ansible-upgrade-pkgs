@@ -6,7 +6,7 @@
 #  macports: name=* present=latest
 #  when: ansible_os_family == "Darwin"
 - name: Darwin | macports port selfupdate dryrun
-  shell: "/opt/local/bin/port -yv selfupdate --nosync"
+  command: "/opt/local/bin/port -yv selfupdate --nosync"
   register: darwinmpsu0
   changed_when: false
   ignore_errors: true
@@ -27,7 +27,7 @@
         upgradepkgs_darwin_santa_temporary_monitor
 
     - name: Darwin | macports port selfupdate
-      shell: "/opt/local/bin/port selfupdate"
+      command: "/opt/local/bin/port selfupdate"
       register: darwinmpsu
     - debug: var=darwinmpsu
       when: (verbose is defined and verbose)
@@ -49,11 +49,11 @@
 
 ## No option to do a dryrun sync
 - name: Darwin | macports sync
-  shell: "/opt/local/bin/port sync"
+  command: "/opt/local/bin/port sync"
   ignore_errors: true
 
 - name: Darwin | check for outdated macports
-  shell: "/opt/local/bin/port outdated"
+  command: "/opt/local/bin/port outdated"
   register: darwinmp
   ignore_errors: true
   changed_when: false
@@ -71,7 +71,7 @@
         upgradepkgs_darwin_santa_temporary_monitor
 
     - name: Darwin | macports port outdated upgrade
-      shell: "/opt/local/bin/port upgrade outdated "
+      command: "/opt/local/bin/port upgrade outdated "
       register: darwinmp2
     - name: set darwin_updated var
       set_fact:
@@ -101,7 +101,7 @@
 ## FIXME! to still allow rollback, would need an inactive minus 1/n back
 - block:
     - name: Darwin | macports uninstall inactive
-      shell: "/opt/local/bin/port uninstall inactive"
+      command: "/opt/local/bin/port uninstall inactive"
       register: darwinmpi2
       ignore_errors: true
     - name: set darwin_updated var

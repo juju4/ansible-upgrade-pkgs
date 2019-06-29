@@ -95,6 +95,6 @@
         livepatch.stat.exists and livepatchstatus is defined and
         livepatchstatus.stdout is defined and
         livepatchstatus.stdout.find("fully-patched{{ ':' }} true") != -1
-  when: file.stat.exists is defined and file.stat.exists == true and ansible_distribution == 'Ubuntu'
+  when: file.stat.exists is defined and file.stat.exists and ansible_distribution == 'Ubuntu'
 
 - debug: var=upgrade_need_reboot

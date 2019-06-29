@@ -18,14 +18,15 @@
     ## not needed if reboot
     #- name: relink libraries
     #  command: /sbin/ldconfig
-    
+
     # or just halt ?
 
 #   - name: wait for the server to finish rebooting
 #     local_action: wait_for host="{{ inventory_hostname }}" search_regex=OpenSSH port=22 timeout=300
 
     - name: waiting for server to come back
-      local_action: wait_for host={{ inventory_hostname }} state=started
+      wait_for: host={{ inventory_hostname }} state=started
+      delegate_to: localhost
       become: false
 #      when: file.stat.exists is defined and file.stat.exists == true and not noreboot
       when: >
