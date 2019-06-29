@@ -1,10 +1,11 @@
 ---
 
 - name: Debian | ensure appropriate packages are present
-  apt: name={{ item }} state=present
-  with_items:
-    - update-notifier-common
-    - aptitude
+  apt:
+    name:
+      - update-notifier-common
+      - aptitude
+    state: present
   register: pkg_result
   until: pkg_result is success
 
