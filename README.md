@@ -57,6 +57,11 @@ $ vagrant ssh
 
 ## Troubleshooting & Known issues
 
+N/A
+
+## See also
+
+* https://access.redhat.com/discussions/3155941, https://github.com/Tronde/ansible-role-rhel-patchmanagement
 
 ## License
 
