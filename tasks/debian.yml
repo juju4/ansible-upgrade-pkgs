@@ -45,24 +45,13 @@
   register: aptf
   until: aptf is success
 
-- name: apt | Check if packages need to be autoremoved
-  command: apt-get --dry-run autoremove
-  register: check_autoremove
-  changed_when: False
-  failed_when: false
-  args:
-    warn: false
-#- debug: var=check_autoremove
-## Note: remote module does not support check mode
 - name: apt | Autoremove unused packages
-  command: apt-get -y autoremove
-  when: check_autoremove.stdout is defined and check_autoremove.stdout.find("packages will be REMOVED") != -1
-#NOK when: check_autoremove.stdout is defined and "'packages will be REMOVED' in check_autoremove.stdout"
-#NOK when: check_autoremove.rc != 0
+  apt:
+    autoremove: yes
   register: aptr
 
 - name: Need HIDS update
-  set_fact:
+  set_fact:  # noqa no-handler
     upgrade_need_hidsupdate: true
   when: aptf.changed or aptr.changed
 
@@ -102,4 +91,5 @@
         "fully-patched: true" in livepatchstatus.stdout
   when: file.stat.exists is defined and file.stat.exists and ansible_distribution == 'Ubuntu'
 
-- debug: var=upgrade_need_reboot
+- name: Debug | var upgrade_need_reboot
+  debug: var=upgrade_need_reboot

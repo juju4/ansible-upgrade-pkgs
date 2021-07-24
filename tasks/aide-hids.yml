@@ -26,41 +26,42 @@
 - name: replacing missing current db with aide.db.new
   command: "mv {{ aide_dbnew }} {{ aide_db }}"
   when: hidsaide.stat.exists and not aidedb.stat.exists and aidedbnew.stat.exists
-#- debug: var=ansible_os_family
+# - debug: var=ansible_os_family
 
 - block:
-#    - debug: msg="goes on..."
-#    - debug: var=hidsaide
-#    - debug: var=aidedb
 
     - name: non-darwin | update aide database
-      shell: "{{ item }}"
+      shell: |
+        set -o pipefail
       with_items:
         - "{{ aide_bin }} -u > /tmp/aide.log 2>&1"
-        - "savelog -c {{ upgrade_aidedb_rotate }} {{ aide_db }}"
+        - "savelog -c {{ upgrade_aidedb_rotate }} {{ aide_db }}"
         - "mv {{ aide_dbnew }} {{ aide_db }}"
+      args:
+        executable: /bin/bash
       when: hidsaide.stat.exists and (aidedb.stat.exists or aidedbnew.stat.exists)
-      ignore_errors: true       # aide -u. rc 4 or 7
-## aide can be very long but we don't want too long...
+      failed_when: false
       async: 3600
       poll: 180
       tags:
         - aidehids
 
     - name: init aide database
-      command: "{{ item }}"
+      command: "{{ item }}"
       with_items:
         - "{{ aide_bin }} -i"
         - "mv {{ aide_dbnew }} {{ aide_db }}"
       when: hidsaide.stat.exists and not aidedb.stat.exists
-      ignore_errors: true       # aide -i
+      failed_when: false
       tags:
         - aidehids
   when: ansible_os_family != "Darwin"
 
 - block:
     - name: Darwin | update aide database
-      shell: "{{ item }}"
+      shell: |
+        set -o pipefail
+        {{ item }}
       with_items:
         - "[ -f /opt/local/var/log/aide/aide.log ] && mv /opt/local/var/log/aide/aide.log
            /opt/local/var/log/aide/aide.log.0"
@@ -70,23 +71,24 @@
            mv {{ aide_db }}.$n {{ aide_db }}.`expr {{ upgrade_aidedb_rotate }} + 1 - $i`; done"
         - "mv {{ aide_db }} {{ aide_db }}.0"
         - "mv {{ aide_dbnew }} {{ aide_db }}"
+      args:
+        executable: /bin/bash
       when: >
         hidsaide.stat.exists and (aidedb.stat.exists or aidedbnew.stat.exists) and
         ansible_os_family == "Darwin" and darwin_updated is defined and darwin_updated
-      ignore_errors: true       # aide -u
-## aide can be very long but we don't want too long...
+      failed_when: false
       async: 3600
       poll: 180
       tags:
         - aidehids
 
     - name: Darwin | init aide database
-      command: "{{ item }}"
+      command: "{{ item }}"
       with_items:
         - "{{ aide_bin }} -i"
         - "mv {{ aide_dbnew }} {{ aide_db }}"
       when: hidsaide.stat.exists and not aidedb.stat.exists
-      ignore_errors: true       # aide -i
+      failed_when: false       # aide -i
       tags:
         - aidehids
   when: ansible_os_family == "Darwin"
@@ -98,7 +100,7 @@
 - block:
     - name: copy patch for aide
       template: src=patch-cron.daily-aide dest=/root/patch-cron.daily-aide mode=0400
-## FIXME! patch module not idempotent so adding file marker
+    ## FIXME! patch module not idempotent so adding file marker
     - name: Patch cron.daily/aide to rotate database
       patch: >
         src=/root/patch-cron.daily-aide
@@ -106,5 +108,8 @@
         remote_src=yes
         backup=yes
     - name: Set marker for aide cron patch
-      file: dest=/etc/cron.daily/.aide-harden-patch state=touch
+      file:
+        dest: /etc/cron.daily/.aide-harden-patch
+        state: touch
+        mode: '0600'
   when: not aidepatch.stat.exists and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')

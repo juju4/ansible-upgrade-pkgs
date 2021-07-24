@@ -2,9 +2,9 @@
 ## FIXME! add support if googlesanta installed and in Lockdown mode... must switch to monitor during upgrade
 
 ## FIXME! not supported
-#- name: Darwin | macports upgrade
-#  macports: name=* present=latest
-#  when: ansible_os_family == "Darwin"
+# - name: Darwin | macports upgrade
+#   macports: name=* present=latest
+#   when: ansible_os_family == "Darwin"
 - name: Darwin | macports port selfupdate dryrun
   command: "/opt/local/bin/port -yv selfupdate --nosync"
   register: darwinmpsu0
@@ -12,7 +12,8 @@
   ignore_errors: true
   async: 1800
   poll: 180
-- debug: var=darwinmpsu0
+- name: Debug | var darwinmpsu0
+  debug: var=darwinmpsu0
   when: (verbose is defined and verbose)
 
 - block:
@@ -29,7 +30,8 @@
     - name: Darwin | macports port selfupdate
       command: "/opt/local/bin/port selfupdate"
       register: darwinmpsu
-    - debug: var=darwinmpsu
+    - name: Debug | var darwinmpsu
+      debug: var=darwinmpsu
       when: (verbose is defined and verbose)
     - name: set darwin_updated var
       set_fact:
@@ -50,14 +52,16 @@
 ## No option to do a dryrun sync
 - name: Darwin | macports sync
   command: "/opt/local/bin/port sync"
-  ignore_errors: true
+  failed_when: false
+  changed_when: true
 
 - name: Darwin | check for outdated macports
   command: "/opt/local/bin/port outdated"
   register: darwinmp
   ignore_errors: true
   changed_when: false
-- debug: var=darwinmp
+- name: Debug | var darwinmp
+  debug: var=darwinmp
   when: (verbose is defined and verbose)
 - block:
     - name: Google Santa | ensure config set to monitor mode
@@ -96,7 +100,8 @@
   ignore_errors: true
   changed_when: false
 
-- debug: var=darwinmpi
+- name: Debug | var darwinmpi
+  debug: var=darwinmpi
   when: (verbose is defined and verbose)
 ## FIXME! to still allow rollback, would need an inactive minus 1/n back
 - block:

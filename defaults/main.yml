@@ -2,11 +2,11 @@
 
 verbose: true
 
-noreboot: # if you want to disable necessary reboot, list systems here
+noreboot:  # if you want to disable necessary reboot, list systems here
   host1: true
 ## to disable reboot in all case
 noreboot_all: false
-vboxguest: # list VM
+vboxguest:  # list VM
   vm1: true
 
 upgrade_aidedb_update: true
@@ -17,7 +17,7 @@ upgradepkgs_darwinmp_remove_inactive: false
 
 upgradepkgs_darwin_santa_temporary_monitor: true
 ## NOK
-#upgradepkgs_darwin_santa_temporary_monitor: false
+# upgradepkgs_darwin_santa_temporary_monitor: false
 
 harden_darwin_santa_db_type: string
-#harden_darwin_santa_db_type: int
+# harden_darwin_santa_db_type: int

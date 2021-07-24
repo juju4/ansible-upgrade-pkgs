@@ -1,11 +1,5 @@
 ---
 
-#- name: Include version-specific variables for Ubuntu.
-#  include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
-#  when: ansible_os_family == 'Debian'
-#- name: Include version-specific variables for RedHat
-#  include_vars: "RedHat-{{ ansible_distribution_version.split('.')[0] }}.yml"
-#  when: ansible_os_family == 'RedHat'
 - name: Include specific variables per other os family
   include_vars: "{{ ansible_os_family }}.yml"
 
@@ -32,6 +26,7 @@
 - include: aide-hids.yml
   when: (upgrade_need_hidsupdate and upgrade_aidedb_update) or (upgrade_forceaide is defined and upgrade_forceaide)
 
-- debug: var=upgrade_need_reboot
+- name: Debug | var upgrade_need_reboot
+  debug: var=upgrade_need_reboot
 - include: reboot.yml
   when: upgrade_need_reboot and not noreboot_all
