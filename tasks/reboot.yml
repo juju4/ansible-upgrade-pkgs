@@ -12,20 +12,8 @@
 #              noreboot[inventory_hostname]) and ansible_virtualization_type != 'lxc' }}"
 - block:
     - name: Reboot system
-## Note: in some case, reboot froze ansible play
-      #command: /sbin/reboot
-## --reboot option is only available on ubuntu xenial/16.04+, not trusty/14.04
-#      command: /sbin/shutdown --reboot +1
-      command: /sbin/shutdown -r +1
-      async: 0
-      poll: 0
-      ignore_errors: true
-
-    - name: waiting for server to come back
-      wait_for: host={{ inventory_hostname }} state=started
-      delegate_to: localhost
-      become: false
-
+      reboot:
+        reboot_timeout: 300
   when: >
     not (noreboot is defined and noreboot[inventory_hostname] is defined and noreboot[inventory_hostname]) and
     ansible_virtualization_type != 'lxc'

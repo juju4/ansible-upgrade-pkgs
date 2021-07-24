@@ -1,22 +1,34 @@
 ---
 
+- name: Debian | Update cache
+  apt:
+    update_cache: yes
+    cache_valid_time: "{{ upgradepkgs_apt_cache_valid_time | default('3600') }}"
+  become: yes
+
 - name: Debian | ensure appropriate packages are present
   apt:
-    name:
-      - update-notifier-common
-      - aptitude
+    name: aptitude
     state: present
   register: pkg_result
   until: pkg_result is success
+
+- name: Debian | ensure update-notifier-common package is present
+  apt:
+    name: update-notifier-common
+    state: present
+  register: pkg_result
+  until: pkg_result is success
+  when: ansible_architecture != 'armv7l'
 
 ## FIXME! http://askubuntu.com/questions/441921/why-does-usr-lib-update-notifier-apt-check-not-agree-with-apt-get-upgrade
 - name: Debian | Check if there are packages available to be installed/upgraded
   command: /usr/lib/update-notifier/apt-check --package-names
   register: packages
   changed_when: False
-  ignore_errors: true
   tags:
     - upgrade
+  when: ansible_architecture != 'armv7l'
 
 ## https://github.com/ansible/ansible/issues/11601
 ## https://github.com/ansible/ansible-modules-core/issues/1741
@@ -24,7 +36,8 @@
 ## Note: some upgrade can fail if /run is full/too small.
 ##      => mount -o remount,size=200m /run
 - name: Debian | upgrade all packages to the latest version (full)
-  apt: upgrade=full update_cache=yes cache_valid_time=3600
+  apt:
+    upgrade: full
   tags:
     - upgrade
   async: 3600
@@ -32,22 +45,13 @@
   register: aptf
   until: aptf is success
 
-- name: Debian | upgrade all packages to the latest version (dist)
-  apt: upgrade=dist update_cache=yes cache_valid_time=3600
-  tags:
-    - upgrade
-## FIXME! FAILED! => {"changed": false, "failed": true,
-#       "msg": "The async task did not return valid JSON: expected string or buffer"}
-  async: 3600
-  poll: 180
-  register: aptd
-  until: aptd is success
-
 - name: apt | Check if packages need to be autoremoved
   command: apt-get --dry-run autoremove
   register: check_autoremove
   changed_when: False
-  ignore_errors: true
+  failed_when: false
+  args:
+    warn: false
 #- debug: var=check_autoremove
 ## Note: remote module does not support check mode
 - name: apt | Autoremove unused packages
@@ -60,7 +64,7 @@
 - name: Need HIDS update
   set_fact:
     upgrade_need_hidsupdate: true
-  when: aptf.changed or aptd.changed or aptr.changed
+  when: aptf.changed or aptr.changed
 
 - name: Debian | Check if a reboot is required
   register: file
@@ -88,14 +92,14 @@
       when: >
         livepatch.stat.exists and livepatchstatus is defined and
         livepatchstatus.stdout is defined and
-        livepatchstatus.stdout.find("fully-patched{{ ':' }} true") != -1
+        "fully-patched: true" in livepatchstatus.stdout
     - name: Set fact upgrade_need_reboot
       set_fact:
         upgrade_need_reboot: false
       when: >
         livepatch.stat.exists and livepatchstatus is defined and
         livepatchstatus.stdout is defined and
-        livepatchstatus.stdout.find("fully-patched{{ ':' }} true") != -1
+        "fully-patched: true" in livepatchstatus.stdout
   when: file.stat.exists is defined and file.stat.exists and ansible_distribution == 'Ubuntu'
 
 - debug: var=upgrade_need_reboot
