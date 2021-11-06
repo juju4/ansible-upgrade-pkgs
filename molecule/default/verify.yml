@@ -31,7 +31,7 @@
           register: aptu
         - name: Debian | Ensure no new update
           assert:
-            that: aptu.stdout == 'Listing... Done'
+            that: aptu.stdout == 'Listing...' and aptu.rc == 0
       when: ansible_os_family == 'Debian'
 
     - name: Check if upgrades still available
