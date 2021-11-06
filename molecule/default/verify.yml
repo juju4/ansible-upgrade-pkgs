@@ -12,18 +12,26 @@
         update_file: /var/lib/apt/periodic/update-success-stamp
       when: ansible_distribution == 'Ubuntu'
   tasks:
-    - name: Debian | Get update file statistics
-      stat:
-        path: "{{ update_file }}"
-      register: f
-      when: ansible_os_family == 'Debian'
-    - name: Debug | file stat
-      debug:
-        var: f
-        verbosity: 1
-    - name: Debian | Ensure update file updated less than a day ago
-      assert:
-        that: f.stat.exists and f.stat.mtime >=  (ansible_date_time.epoch|int - 3600*24)
+    - block:
+        - name: Debian | Get update file statistics
+          stat:
+            path: "{{ update_file }}"
+          register: f
+        - name: Debug | file stat
+          debug:
+            var: f
+            verbosity: 1
+        - name: Debian | Ensure update file updated less than a day ago
+          assert:
+            that: f.stat.exists and f.stat.mtime >=  (ansible_date_time.epoch|int - 3600*24)
+          when: False
+
+        - name: Check if upgrades still available
+          command: apt list --upgradable
+          register: aptu
+        - name: Debian | Ensure no new update
+          assert:
+            that: aptu.stdout == 'Listing... Done'
       when: ansible_os_family == 'Debian'
 
     - name: Check if upgrades still available
