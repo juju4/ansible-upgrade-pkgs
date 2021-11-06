@@ -92,24 +92,3 @@
       tags:
         - aidehids
   when: ansible_os_family == "Darwin"
-
-## in case, aide was updated and file replace
-- name: Check if aide cron has already been patched
-  stat: path=/etc/cron.daily/.aide-harden-patch
-  register: aidepatch
-- block:
-    - name: copy patch for aide
-      template: src=patch-cron.daily-aide dest=/root/patch-cron.daily-aide mode=0400
-    ## FIXME! patch module not idempotent so adding file marker
-    - name: Patch cron.daily/aide to rotate database
-      patch: >
-        src=/root/patch-cron.daily-aide
-        dest=/etc/cron.daily/aide
-        remote_src=yes
-        backup=yes
-    - name: Set marker for aide cron patch
-      file:
-        dest: /etc/cron.daily/.aide-harden-patch
-        state: touch
-        mode: '0600'
-  when: not aidepatch.stat.exists and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
