@@ -1,10 +1,12 @@
 ---
 
 - name: Redhat | upgrade all packages
-  yum:  # noqa package-latest
+  package:  # noqa package-latest
     name: '*'
     state: latest
     update_cache: yes
+    skip_broken: "{{ upgrade_rhel_skip_broken | default('no') }}"
+    security: "{{ upgrade_rhel_security_only | default('no') }}"
   tags:
     - upgrade
   async: 3600
