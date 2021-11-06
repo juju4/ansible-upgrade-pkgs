@@ -19,7 +19,7 @@
       when: ansible_os_family == 'Debian'
     - name: Debian | Ensure update file updated less than a day ago
       assert:
-        than: f.stat.mtime >=  (ansible_date_time.epoch|int - 3600*24)
+        that: f.stat.mtime >=  (ansible_date_time.epoch|int - 3600*24)
       when: ansible_os_family == 'Debian'
 
     - name: Check if upgrades still available
