@@ -1,0 +1,28 @@
+---
+
+- name: Verify
+  hosts: upgrades
+  pre_tasks:
+    - name: Debian | set update file
+      set_fact:
+        update_file: /var/lib/apt/lists/partial
+      when: ansible_os_family == 'Debian'
+    - name: Ubuntu | set update file
+      set_fact:
+        update_file: /var/lib/apt/periodic/update-success-stamp
+      when: ansible_distribution == 'Ubuntu'
+  tasks:
+    - name: Debian | Get update file statistics
+      stat:
+        path: "{{ update_file }}"
+      register: f
+      when: ansible_os_family == 'Debian'
+    - name: Debian | Ensure update file updated less than a day ago
+      assert:
+        than: f.stat.mtime >=  (ansible_date_time.epoch|int - 3600*24)
+      when: ansible_os_family == 'Debian'
+
+    - name: Check if upgrades still available
+      command: dnf updateinfo list --security
+      register: dnfu
+      when: ansible_os_family == 'RedHat'
