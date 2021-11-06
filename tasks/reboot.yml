@@ -6,7 +6,7 @@
 
 - name: Need to reboot system but asked not
   debug: msg="You will need to reboot system. asked ansible not doing it."
-  when: noreboot is defined and noreboot[inventory_hostname]
+  when: noreboot is defined and noreboot[inventory_hostname] is defined and noreboot[inventory_hostname]
 
 # - debug: var="{{ not (noreboot is defined and noreboot[inventory_hostname] is defined and
 #               noreboot[inventory_hostname]) and ansible_virtualization_type != 'lxc' }}"
