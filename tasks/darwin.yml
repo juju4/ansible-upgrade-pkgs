@@ -12,7 +12,7 @@
 
 - block:
     - name: Darwin | system upgrade
-      shell: "softwareupdate --install --all | tee /tmp/softwareupdate.out"
+      shell: "softwareupdate --install --all | tee /tmp/softwareupdate.out"  # noqa no-changed-when
       async: 3600
       poll: 180
       register: darwinsu2

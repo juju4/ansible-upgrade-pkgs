@@ -28,7 +28,7 @@
         upgradepkgs_darwin_santa_temporary_monitor
 
     - name: Darwin | macports port selfupdate
-      command: "/opt/local/bin/port selfupdate"
+      command: "/opt/local/bin/port selfupdate"  # noqa no-changed-when
       register: darwinmpsu
     - name: Debug | var darwinmpsu
       debug: var=darwinmpsu
@@ -75,7 +75,7 @@
         upgradepkgs_darwin_santa_temporary_monitor
 
     - name: Darwin | macports port outdated upgrade
-      command: "/opt/local/bin/port upgrade outdated "
+      command: "/opt/local/bin/port upgrade outdated "  # noqa no-changed-when
       register: darwinmp2
     - name: set darwin_updated var
       set_fact:
@@ -106,7 +106,7 @@
 ## FIXME! to still allow rollback, would need an inactive minus 1/n back
 - block:
     - name: Darwin | macports uninstall inactive
-      command: "/opt/local/bin/port uninstall inactive"
+      command: "/opt/local/bin/port uninstall inactive"  # noqa no-changed-when
       register: darwinmpi2
       ignore_errors: true
     - name: set darwin_updated var

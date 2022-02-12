@@ -28,6 +28,7 @@
 
         - name: Check if upgrades still available
           command: apt list --upgradable
+          changed_when: false
           register: aptu
         - name: Debian | Ensure no new update
           assert:
