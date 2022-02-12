@@ -34,4 +34,4 @@
         mode: '0600'
   when: (darwinsu2.stdout is defined and darwinsu2.stdout.find("Please restart immediately") != -1)
 
-- include: darwin-macports.yml
+- import_tasks: darwin-macports.yml

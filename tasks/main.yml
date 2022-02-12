@@ -8,25 +8,25 @@
     upgrade_need_reboot: false
     upgrade_need_hidsupdate: false
 
-- include: debian.yml
+- import_tasks: debian.yml
   when: ansible_os_family == 'Debian'
 
-- include: redhat.yml
+- import_tasks: redhat.yml
   when: ansible_os_family == 'RedHat'
 
-- include: alpine.yml
+- import_tasks: alpine.yml
   when: ansible_os_family == 'Alpine'
 
-- include: darwin.yml
+- import_tasks: darwin.yml
   when: ansible_os_family == 'Darwin'
 
-- include: openbsd.yml
+- import_tasks: openbsd.yml
   when: ansible_os_family == 'OpenBSD'
 
-- include: aide-hids.yml
+- import_tasks: aide-hids.yml
   when: (upgrade_need_hidsupdate and upgrade_aidedb_update) or (upgrade_forceaide is defined and upgrade_forceaide)
 
 - name: Debug | var upgrade_need_reboot
   debug: var=upgrade_need_reboot
-- include: reboot.yml
+- import_tasks: reboot.yml
   when: upgrade_need_reboot and not noreboot_all
