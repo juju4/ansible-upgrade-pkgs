@@ -38,4 +38,4 @@
     - name: Check if upgrades still available
       command: dnf updateinfo list --security
       register: dnfu
-      when: ansible_os_family == 'RedHat'
+      when: ansible_os_family == 'RedHat' and ansible_distribution_major_version|int >= 8
