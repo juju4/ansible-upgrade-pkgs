@@ -4,4 +4,4 @@ aide_bin: '/usr/bin/aide.wrapper'
 aide_db: '/var/lib/aide/aide.db'
 aide_dbnew: "/var/lib/aide/aide.db.new"
 
-apt_notifier_pkg: apt-config-auto-update
+apt_notifier_pkg: update-notifier-common

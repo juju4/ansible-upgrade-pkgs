@@ -15,7 +15,7 @@
 
 - name: Debian | ensure update-notifier-common package is present
   apt:
-    name: update-notifier-common
+    name: "{{ apt_notifier_pkg }}"
     state: present
   register: pkg_result
   until: pkg_result is success
@@ -23,7 +23,7 @@
 
 ## FIXME! http://askubuntu.com/questions/441921/why-does-usr-lib-update-notifier-apt-check-not-agree-with-apt-get-upgrade
 - name: Debian | Check if there are packages available to be installed/upgraded
-  command: /usr/lib/update-notifier/apt-check --package-names
+  command: apt list --upgradeable
   register: packages
   changed_when: False
   tags:

@@ -2,6 +2,8 @@
 
 - name: Include specific variables per other os family
   include_vars: "{{ ansible_os_family }}.yml"
+- name: Include specific variables per distribution
+  include_vars: "{{ ansible_distribution }}.yml"
 
 - name: initialize local variables
   set_fact:
