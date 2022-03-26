@@ -1,0 +1,5 @@
+---
+
+aide_bin: '/usr/bin/aide'
+aide_db: '/var/lib/aide/aide.db'
+aide_dbnew: "/var/lib/aide/aide.db.new"
