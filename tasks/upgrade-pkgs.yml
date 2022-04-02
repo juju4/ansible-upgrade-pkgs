@@ -2,7 +2,7 @@
 
 ## Note: if doing host, might be blocking
 - name: Do we have a virtualbox package update?
-  set_fact:
+  ansible.builtin.set_fact:
     virtualbox_host: true
   when: >
     ansible_system == "Linux" and
@@ -10,17 +10,17 @@
     packages.stdout.find("virtualbox-") != -1
 
 - name: Fail check
-  fail: msg="Warning! update includes virtualbox..."
+  ansible.builtin.fail: msg="Warning! update includes virtualbox..."
   when: virtualbox_host is defined and virtualbox_host
 
 - name: Debug | var file
-  debug:
+  ansible.builtin.debug:
     var: file
     verbosity: 1
 
 ## not needed if reboot
 # - name: relink libraries
-#   command: /sbin/ldconfig
+#   ansible.builtin.command: /sbin/ldconfig
 
 # or just halt ?
 
@@ -28,7 +28,7 @@
 #   local_action: wait_for host="{{ inventory_hostname }}" search_regex=OpenSSH port=22 timeout=300
 
 - name: waiting for server to come back
-  wait_for: host={{ inventory_hostname }} state=started
+  ansible.builtin.wait_for: host={{ inventory_hostname }} state=started
   delegate_to: localhost
   become: false
   when: >

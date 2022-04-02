@@ -2,37 +2,38 @@
 
 ## assess if aide present and current db
 - name: Linux | ensure aide is installed
-  package: name=aide state=present
+  ansible.builtin.package: name=aide state=present
   when: ansible_system == "Linux" and ansible_distribution != 'NA' and ansible_os_family != "Alpine"
   register: pkg_result
   until: pkg_result is success
 - name: check if aide binary is present
-  stat: path={{ aide_bin }}
+  ansible.builtin.stat: path={{ aide_bin }}
   register: hidsaide
   tags:
     - aidehids
 - name: check if aide current db is present
-  stat: path={{ aide_db }}
+  ansible.builtin.stat: path={{ aide_db }}
   register: aidedb
   tags:
     - aidehids
 - name: check if aide new db is present
-  stat: path={{ aide_dbnew }}
+  ansible.builtin.stat: path={{ aide_dbnew }}
   register: aidedbnew
   tags:
     - aidehids
 
 
 - name: replacing missing current db with aide.db.new
-  command: "mv {{ aide_dbnew }} {{ aide_db }}"
+  ansible.builtin.command: "mv {{ aide_dbnew }} {{ aide_db }}"
   when: hidsaide.stat.exists and not aidedb.stat.exists and aidedbnew.stat.exists
 # - debug: var=ansible_os_family
 
 - block:
 
     - name: non-darwin | update aide database
-      shell: |
+      ansible.builtin.shell: |
         set -o pipefail
+        {{ item }}
       with_items:
         - "{{ aide_bin }} -u > /tmp/aide.log 2>&1"
         - "savelog -c {{ upgrade_aidedb_rotate }} {{ aide_db }}"
@@ -47,7 +48,7 @@
         - aidehids
 
     - name: init aide database
-      command: "{{ item }}"
+      ansible.builtin.command: "{{ item }}"
       with_items:
         - "{{ aide_bin }} -i"
         - "mv {{ aide_dbnew }} {{ aide_db }}"
@@ -59,7 +60,7 @@
 
 - block:
     - name: Darwin | update aide database
-      shell: |
+      ansible.builtin.shell: |
         set -o pipefail
         {{ item }}
       with_items:
@@ -83,7 +84,7 @@
         - aidehids
 
     - name: Darwin | init aide database
-      command: "{{ item }}"
+      ansible.builtin.command: "{{ item }}"
       with_items:
         - "{{ aide_bin }} -i"
         - "mv {{ aide_dbnew }} {{ aide_db }}"

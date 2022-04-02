@@ -1,20 +1,20 @@
 ---
 
 - name: Debian | Update cache
-  apt:
+  ansible.builtin.apt:
     update_cache: yes
     cache_valid_time: "{{ upgradepkgs_apt_cache_valid_time | default('3600') }}"
   become: yes
 
 - name: Debian | ensure appropriate packages are present
-  apt:
+  ansible.builtin.apt:
     name: aptitude
     state: present
   register: pkg_result
   until: pkg_result is success
 
 - name: Debian | ensure update-notifier-common package is present
-  apt:
+  ansible.builtin.apt:
     name: "{{ apt_notifier_pkg }}"
     state: present
   register: pkg_result
@@ -23,7 +23,7 @@
 
 ## FIXME! http://askubuntu.com/questions/441921/why-does-usr-lib-update-notifier-apt-check-not-agree-with-apt-get-upgrade
 - name: Debian | Check if there are packages available to be installed/upgraded
-  command: apt list --upgradeable
+  ansible.builtin.command: apt list --upgradeable
   register: packages
   changed_when: False
   tags:
@@ -36,7 +36,7 @@
 ## Note: some upgrade can fail if /run is full/too small.
 ##      => mount -o remount,size=200m /run
 - name: Debian | upgrade all packages to the latest version (full)
-  apt:
+  ansible.builtin.apt:
     upgrade: full
   tags:
     - upgrade
@@ -46,44 +46,44 @@
   until: aptf is success
 
 - name: apt | Autoremove unused packages
-  apt:
+  ansible.builtin.apt:
     autoremove: yes
   register: aptr
 
 - name: Need HIDS update
-  set_fact:  # noqa no-handler
+  ansible.builtin.set_fact:  # noqa no-handler
     upgrade_need_hidsupdate: true
   when: aptf.changed or aptr.changed
 
 - name: Debian | Check if a reboot is required
   register: file
-  stat: path=/var/run/reboot-required get_md5=no
+  ansible.builtin.stat: path=/var/run/reboot-required get_md5=no
   tags:
     - upgrade
 
 - name: Need to reboot system? yes and will do
-  set_fact:
+  ansible.builtin.set_fact:
     upgrade_need_reboot: true
   when: file.stat.exists is defined and file.stat.exists
 
 - block:
     - name: check if canonical live patch installed
-      stat: path=/snap/bin/canonical-livepatch
+      ansible.builtin.stat: path=/snap/bin/canonical-livepatch
       register: livepatch
     - name: is canonical live enabled
-      command: "/snap/bin/canonical-livepatch status"
+      ansible.builtin.command: "/snap/bin/canonical-livepatch status"
       register: livepatchstatus
       ignore_errors: true
       changed_when: false
       when: livepatch.stat.exists
     - name: Need to reboot system?
-      debug: msg="You will need to reboot system but livepatch is enabled. Do at your leasure :)"
+      ansible.builtin.debug: msg="You will need to reboot system but livepatch is enabled. Do at your leasure :)"
       when: >
         livepatch.stat.exists and livepatchstatus is defined and
         livepatchstatus.stdout is defined and
         "fully-patched: true" in livepatchstatus.stdout
     - name: Set fact upgrade_need_reboot
-      set_fact:
+      ansible.builtin.set_fact:
         upgrade_need_reboot: false
       when: >
         livepatch.stat.exists and livepatchstatus is defined and
@@ -92,4 +92,4 @@
   when: file.stat.exists is defined and file.stat.exists and ansible_distribution == 'Ubuntu'
 
 - name: Debug | var upgrade_need_reboot
-  debug: var=upgrade_need_reboot
+  ansible.builtin.debug: var=upgrade_need_reboot

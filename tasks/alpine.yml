@@ -7,7 +7,7 @@
   ## FAILED! => {"changed": false, "failed": true, "invocation": {"module_args": {"name": null, "state": "present",
   #       "update_cache": false, "upgrade": true}, "module_name": "apk"}, "msg": "failed to upgrade packages"}
   # apk: upgrade=yes
-  command: "{{ item }}"  # noqa no-changed-when
+  ansible.builtin.command: "{{ item }}"  # noqa no-changed-when
   with_items:
     - apk update
     - apk upgrade
@@ -18,4 +18,4 @@
   register: alpout
 
 - name: alpine upgrade output
-  debug: var=alpout
+  ansible.builtin.debug: var=alpout

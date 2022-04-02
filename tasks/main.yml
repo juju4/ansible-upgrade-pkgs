@@ -1,12 +1,12 @@
 ---
 
 - name: Include specific variables per other os family
-  include_vars: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
 - name: Include specific variables per distribution
-  include_vars: "{{ ansible_distribution }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_distribution }}.yml"
 
 - name: initialize local variables
-  set_fact:
+  ansible.builtin.set_fact:
     upgrade_need_reboot: false
     upgrade_need_hidsupdate: false
 
@@ -29,6 +29,6 @@
   when: (upgrade_need_hidsupdate and upgrade_aidedb_update) or (upgrade_forceaide is defined and upgrade_forceaide)
 
 - name: Debug | var upgrade_need_reboot
-  debug: var=upgrade_need_reboot
+  ansible.builtin.debug: var=upgrade_need_reboot
 - import_tasks: reboot.yml
   when: upgrade_need_reboot and not noreboot_all

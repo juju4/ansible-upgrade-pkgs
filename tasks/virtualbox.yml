@@ -4,13 +4,13 @@
 ## https://github.com/BTBurke/skeleton-vagrant-ansible/blob/master/provisioning/vboxadditions.yaml
 
 - name: host | check if Virtualbox installed
-  stat: path=/usr/bin/virtualbox
+  ansible.builtin.stat: path=/usr/bin/virtualbox
   delegate_to: localhost
   register: localvbox
   become: no
 - name: Find Host Virtualbox Version
   become: no
-  shell: |
+  ansible.builtin.shell: |
     set -o pipefail
     virtualbox -h | awk '/Oracle VM VirtualBox Manager/ {split($0,a," "); print a[5]}'
   args:
@@ -21,7 +21,7 @@
   changed_when: False
 
 - name: Find Guest Additions Version
-  shell: |
+  ansible.builtin.shell: |
     set -o pipefail
     modinfo vboxguest | awk '/^version:/ { print $2 }'
   args:
@@ -30,28 +30,28 @@
   changed_when: False
 
 - name: Debug | var host_v
-  debug: var=host_v
+  ansible.builtin.debug: var=host_v
   when: (verbose is defined and verbose)
 - name: Debug | var guest_v
-  debug: var=guest_v
+  ansible.builtin.debug: var=guest_v
   when: (verbose is defined and verbose)
 - name: Check if /vagrant path is present
-  stat: path=/vagrant
+  ansible.builtin.stat: path=/vagrant
   register: vagrantdir
 - name: virtualbox guest - vagrant
-  set_fact:
+  ansible.builtin.set_fact:
     isodir: /vagrant/{{ host_v.stdout }}
   when: vagrantdir.stat.exists
 - name: virtualbox guest - generic box
-  set_fact:
+  ansible.builtin.set_fact:
     isodir: /tmp/{{ host_v.stdout }}
   when: not vagrantdir.stat.exists
 - name: Check if Guest Additions iso is present
-  stat: path="/{{ isodir }}/VBoxGuestAdditions_{{ host_v.stdout }}.iso"
+  ansible.builtin.stat: path="/{{ isodir }}/VBoxGuestAdditions_{{ host_v.stdout }}.iso"
   register: vboxguestadditions
   when: host_v.stdout is defined
 - name: Download Guest Additions Installer (when required)
-  get_url:
+  ansible.builtin.get_url:
     dest: "{{ isodir }}"
     url: "http://download.virtualbox.org/virtualbox/{{ host_v.stdout }}/VBoxGuestAdditions_{{ host_v.stdout }}.iso"
     mode: '0644'
@@ -60,7 +60,7 @@
     host_v.stdout != guest_v.stdout and not vboxguestadditions.stat.exists
 
 - name: Check if VBoxGuestAdditions iso is present
-  stat:
+  ansible.builtin.stat:
     path: "{{ isodir }}/VBoxGuestAdditions_{{ host_v.stdout }}.iso"
   register: vboxguestadditions
   when: host_v.stdout is defined
@@ -77,10 +77,10 @@
 
 ## as role/harden protection
 - name: Check if harden apt 99security is present
-  stat: path=/etc/apt/apt.conf.d/99security
+  ansible.builtin.stat: path=/etc/apt/apt.conf.d/99security
   register: hardenapt
 - name: remove immutable tag from /lib directory
-  file:
+  ansible.builtin.file:
     path: /lib
     state: directory
     recurse: yes
@@ -92,18 +92,18 @@
       (virtualbox_host is defined and virtualbox_host)
     )
 - name: Install Guest Additions (when required)
-  command: /mnt/VBoxLinuxAdditions.run --nox11 -- --force
+  ansible.builtin.command: /mnt/VBoxLinuxAdditions.run --nox11 -- --force
   when: >
     host_v is defined and host_v.stdout and guest_v is defined and guest_v.stdout and
     host_v.stdout != guest_v.stdout
   become: yes
   failed_when: false  # Need to ignore errors here because no windowing system is installed on server image.  No way to override.
 - name: Ensure virtualbox module is build for latest kernel
-  command: /sbin/rcvboxdrv setup
+  ansible.builtin.command: /sbin/rcvboxdrv setup
   become: yes
   when: virtualbox_host is defined and virtualbox_host
 - name: set immutable tag from /lib directory
-  file:
+  ansible.builtin.file:
     path: /lib
     state: directory
     recurse: yes
@@ -126,7 +126,7 @@
     #      when: host_v.stdout != guest_v.stdout
 
 - name: apt | Mark VM for reboot since Guest Additions Updated
-  file:
+  ansible.builtin.file:
     path: /var/run/reboot-required
     state: touch
     mode: '0644'

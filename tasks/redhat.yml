@@ -1,7 +1,7 @@
 ---
 
 - name: Redhat | upgrade all packages
-  package:  # noqa package-latest
+  ansible.builtin.package:  # noqa package-latest
     name: '*'
     state: latest
     update_cache: yes
@@ -15,7 +15,7 @@
   until: yumu is success
 
 - name: Need HIDS update
-  set_fact:  # noqa no-handler
+  ansible.builtin.set_fact:  # noqa no-handler
     upgrade_need_hidsupdate: true
   when: yumu.changed
 
@@ -23,7 +23,7 @@
 ## http://serverfault.com/questions/671863/need-to-check-whether-you-need-to-reboot-for-a-kernel-update
 ## http://stackoverflow.com/questions/22597424/ansible-detect-changes-in-certain-files-after-yum-update-and-do-a-reboot
 - name: Check for reboot hint.
-  shell: >
+  ansible.builtin.shell: >
     if [ "`rpm -q kernel --queryformat '%{installtime} %{version}-%{release}.%{arch}\n' |
         sort -n -k1 | tail -1 | cut -d ' ' -f 2`" = "`uname -r`" ]; then
         echo "no"; else echo "reboot";
@@ -32,6 +32,6 @@
   register: reboot_hint
   changed_when: false
 - name: redhat | flag system for reboot
-  set_fact:
+  ansible.builtin.set_fact:
     upgrade_need_reboot: true
   when: reboot_hint.stdout.find("reboot") != -1

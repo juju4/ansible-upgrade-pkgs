@@ -6,14 +6,14 @@
 #   macports: name=* present=latest
 #   when: ansible_os_family == "Darwin"
 - name: Darwin | macports port selfupdate dryrun
-  command: "/opt/local/bin/port -yv selfupdate --nosync"
+  ansible.builtin.command: "/opt/local/bin/port -yv selfupdate --nosync"
   register: darwinmpsu0
   changed_when: false
   ignore_errors: true
   async: 1800
   poll: 180
 - name: Debug | var darwinmpsu0
-  debug: var=darwinmpsu0
+  ansible.builtin.debug: var=darwinmpsu0
   when: (verbose is defined and verbose)
 
 - block:
@@ -28,13 +28,13 @@
         upgradepkgs_darwin_santa_temporary_monitor
 
     - name: Darwin | macports port selfupdate
-      command: "/opt/local/bin/port selfupdate"  # noqa no-changed-when
+      ansible.builtin.command: "/opt/local/bin/port selfupdate"  # noqa no-changed-when
       register: darwinmpsu
     - name: Debug | var darwinmpsu
-      debug: var=darwinmpsu
+      ansible.builtin.debug: var=darwinmpsu
       when: (verbose is defined and verbose)
     - name: set darwin_updated var
-      set_fact:
+      ansible.builtin.set_fact:
         darwin_updated: true
         upgrade_need_hidsupdate: true
   when: (darwinmpsu0.stdout.find("MacPorts base is already the latest version") == -1)
@@ -51,17 +51,17 @@
 
 ## No option to do a dryrun sync
 - name: Darwin | macports sync
-  command: "/opt/local/bin/port sync"
+  ansible.builtin.command: "/opt/local/bin/port sync"
   failed_when: false
   changed_when: true
 
 - name: Darwin | check for outdated macports
-  command: "/opt/local/bin/port outdated"
+  ansible.builtin.command: "/opt/local/bin/port outdated"
   register: darwinmp
   ignore_errors: true
   changed_when: false
 - name: Debug | var darwinmp
-  debug: var=darwinmp
+  ansible.builtin.debug: var=darwinmp
   when: (verbose is defined and verbose)
 - block:
     - name: Google Santa | ensure config set to monitor mode
@@ -75,10 +75,10 @@
         upgradepkgs_darwin_santa_temporary_monitor
 
     - name: Darwin | macports port outdated upgrade
-      command: "/opt/local/bin/port upgrade outdated "  # noqa no-changed-when
+      ansible.builtin.command: "/opt/local/bin/port upgrade outdated "  # noqa no-changed-when
       register: darwinmp2
     - name: set darwin_updated var
-      set_fact:
+      ansible.builtin.set_fact:
         darwin_updated: true
         upgrade_need_hidsupdate: true
   when: not ("No installed ports are outdated." in darwinmp.stdout)
@@ -95,22 +95,22 @@
 ## FIXME! need to regenerate hash whitelist for updated ports...
 
 - name: Darwin | check for inactive macports
-  command: "/opt/local/bin/port installed inactive"
+  ansible.builtin.command: "/opt/local/bin/port installed inactive"
   register: darwinmpi
   ignore_errors: true
   changed_when: false
 
 - name: Debug | var darwinmpi
-  debug: var=darwinmpi
+  ansible.builtin.debug: var=darwinmpi
   when: (verbose is defined and verbose)
 ## FIXME! to still allow rollback, would need an inactive minus 1/n back
 - block:
     - name: Darwin | macports uninstall inactive
-      command: "/opt/local/bin/port uninstall inactive"  # noqa no-changed-when
+      ansible.builtin.command: "/opt/local/bin/port uninstall inactive"  # noqa no-changed-when
       register: darwinmpi2
       ignore_errors: true
     - name: set darwin_updated var
-      set_fact:
+      ansible.builtin.set_fact:
         darwin_updated: true
         upgrade_need_hidsupdate: true
   when: >

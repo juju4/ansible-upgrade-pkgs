@@ -4,38 +4,38 @@
   hosts: upgrades
   pre_tasks:
     - name: Debian | set update file
-      set_fact:
+      ansible.builtin.set_fact:
         update_file: /var/lib/apt/lists/partial
       when: ansible_os_family == 'Debian'
     - name: Ubuntu | set update file
-      set_fact:
+      ansible.builtin.set_fact:
         update_file: /var/lib/apt/periodic/update-success-stamp
       when: ansible_distribution == 'Ubuntu'
   tasks:
     - block:
         - name: Debian | Get update file statistics
-          stat:
+          ansible.builtin.stat:
             path: "{{ update_file }}"
           register: f
         - name: Debug | file stat
-          debug:
+          ansible.builtin.debug:
             var: f
             verbosity: 1
         - name: Debian | Ensure update file updated less than a day ago
-          assert:
+          ansible.builtin.assert:
             that: f.stat.exists and f.stat.mtime >=  (ansible_date_time.epoch|int - 3600*24)
           when: False
 
         - name: Check if upgrades still available
-          command: apt list --upgradable
+          ansible.builtin.command: apt list --upgradable
           changed_when: false
           register: aptu
         - name: Debian | Ensure no new update
-          assert:
+          ansible.builtin.assert:
             that: aptu.stdout == 'Listing...' and aptu.rc == 0
       when: ansible_os_family == 'Debian'
 
     - name: Check if upgrades still available
-      command: dnf updateinfo list --security
+      ansible.builtin.command: dnf updateinfo list --security
       register: dnfu
       when: ansible_os_family == 'RedHat' and ansible_distribution_major_version|int >= 8
