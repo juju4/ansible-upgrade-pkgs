@@ -12,7 +12,8 @@
         update_file: /var/lib/apt/periodic/update-success-stamp
       when: ansible_distribution == 'Ubuntu'
   tasks:
-    - block:
+    - name: Debian
+      block:
         - name: Debian | Get update file statistics
           ansible.builtin.stat:
             path: "{{ update_file }}"

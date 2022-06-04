@@ -16,7 +16,8 @@
   ansible.builtin.debug: var=darwinmpsu0
   when: (verbose is defined and verbose)
 
-- block:
+- name: macports update
+  block:
     - name: Google Santa | ensure config set to monitor mode
       osx_defaults:
         domain: /var/db/santa/config.plist
@@ -63,7 +64,8 @@
 - name: Debug | var darwinmp
   ansible.builtin.debug: var=darwinmp
   when: (verbose is defined and verbose)
-- block:
+- name: macports port outdated
+  block:
     - name: Google Santa | ensure config set to monitor mode
       osx_defaults:
         domain: /var/db/santa/config.plist
@@ -104,7 +106,8 @@
   ansible.builtin.debug: var=darwinmpi
   when: (verbose is defined and verbose)
 ## FIXME! to still allow rollback, would need an inactive minus 1/n back
-- block:
+- name: macports ports inactive
+  block:
     - name: Darwin | macports uninstall inactive
       ansible.builtin.command: "/opt/local/bin/port uninstall inactive"  # noqa no-changed-when
       register: darwinmpi2

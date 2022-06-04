@@ -10,7 +10,8 @@
 
 # - debug: var="{{ not (noreboot is defined and noreboot[inventory_hostname] is defined and
 #               noreboot[inventory_hostname]) and ansible_virtualization_type != 'lxc' }}"
-- block:
+- name: Reboot
+  block:
     - name: Reboot system
       ansible.builtin.reboot:
         reboot_timeout: 300
