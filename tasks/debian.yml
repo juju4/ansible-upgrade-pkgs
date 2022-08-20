@@ -13,13 +13,16 @@
   register: pkg_result
   until: pkg_result is success
 
+- debug: var=ansible_architecture
 - name: Debian | ensure update-notifier-common package is present
   ansible.builtin.apt:
     name: "{{ apt_notifier_pkg }}"
     state: present
   register: pkg_result
   until: pkg_result is success
-  when: ansible_architecture != 'armv7l'
+  when:
+    - ansible_architecture != 'armv7l'
+    - ansible_architecture != 'armv6l'
 
 ## FIXME! http://askubuntu.com/questions/441921/why-does-usr-lib-update-notifier-apt-check-not-agree-with-apt-get-upgrade
 - name: Debian | Check if there are packages available to be installed/upgraded
@@ -28,7 +31,9 @@
   changed_when: False
   tags:
     - upgrade
-  when: ansible_architecture != 'armv7l'
+  when:
+    - ansible_architecture != 'armv7l'
+    - ansible_architecture != 'armv6l'
 
 ## https://github.com/ansible/ansible/issues/11601
 ## https://github.com/ansible/ansible-modules-core/issues/1741
