@@ -13,7 +13,11 @@
   register: pkg_result
   until: pkg_result is success
 
-- debug: var=ansible_architecture
+- name: Debug | var ansible_architecture
+  ansible.builtin.debug:
+    var: ansible_architecture
+    verbosity: 1
+
 - name: Debian | ensure update-notifier-common package is present
   ansible.builtin.apt:
     name: "{{ apt_notifier_pkg }}"
