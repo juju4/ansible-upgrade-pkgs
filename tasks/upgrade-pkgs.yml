@@ -4,10 +4,11 @@
 - name: Do we have a virtualbox package update?
   ansible.builtin.set_fact:
     virtualbox_host: true
-  when: >
-    ansible_system == "Linux" and
-    packages is defined and packages.stdout is defined and
-    packages.stdout.find("virtualbox-") != -1
+  when:
+    - ansible_system == "Linux"
+    - packages is defined
+    - packages.stdout is defined
+    - packages.stdout.find("virtualbox-") != -1
 
 - name: Fail check
   ansible.builtin.fail: msg="Warning! update includes virtualbox..."
@@ -27,14 +28,13 @@
 # - name: wait for the server to finish rebooting
 #   local_action: wait_for host="{{ inventory_hostname }}" search_regex=OpenSSH port=22 timeout=300
 
-- name: waiting for server to come back
+- name: Waiting for server to come back
   ansible.builtin.wait_for: host={{ inventory_hostname }} state=started
   delegate_to: localhost
   become: false
   when: >
-    (file.stat.exists is defined and file.stat.exists|bool and
+    (file.stat.exists is defined and file.stat.exists | bool and
       (not noreboot or noreboot[inventory_hostname] is not defined)
-    ) or
-    (ansible_os_family == "Darwin" and
+    ) or (ansible_os_family == "Darwin" and
       (darwinsu2.stdout is defined and darwinsu2.stdout.find("Please restart immediately") != -1)
     )

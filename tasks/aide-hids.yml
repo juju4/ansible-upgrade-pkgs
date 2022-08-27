@@ -6,24 +6,24 @@
   when: ansible_system == "Linux" and ansible_distribution != 'NA' and ansible_os_family != "Alpine"
   register: pkg_result
   until: pkg_result is success
-- name: check if aide binary is present
+- name: Check if aide binary is present
   ansible.builtin.stat: path={{ aide_bin }}
   register: hidsaide
   tags:
     - aidehids
-- name: check if aide current db is present
+- name: Check if aide current db is present
   ansible.builtin.stat: path={{ aide_db }}
   register: aidedb
   tags:
     - aidehids
-- name: check if aide new db is present
+- name: Check if aide new db is present
   ansible.builtin.stat: path={{ aide_dbnew }}
   register: aidedbnew
   tags:
     - aidehids
 
 
-- name: replacing missing current db with aide.db.new
+- name: Replacing missing current db with aide.db.new
   ansible.builtin.command: "mv {{ aide_dbnew }} {{ aide_db }}"
   when: hidsaide.stat.exists and not aidedb.stat.exists and aidedbnew.stat.exists
 # - debug: var=ansible_os_family
@@ -31,7 +31,7 @@
 - name: Non-Darwin system
   block:
 
-    - name: non-darwin | update aide database
+    - name: Non-darwin | update aide database
       ansible.builtin.shell: |
         set -o pipefail
         {{ item }}
@@ -48,7 +48,7 @@
       tags:
         - aidehids
 
-    - name: init aide database
+    - name: Init aide database
       ansible.builtin.command: "{{ item }}"
       with_items:
         - "{{ aide_bin }} -i"

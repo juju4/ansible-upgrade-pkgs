@@ -10,22 +10,22 @@
   ansible.builtin.debug: var=darwinsu
   when: (verbose is defined and verbose)
 
-- name: system
+- name: System
   block:
     - name: Darwin | system upgrade
       ansible.builtin.shell: "softwareupdate --install --all | tee /tmp/softwareupdate.out"  # noqa no-changed-when
       async: 3600
       poll: 180
       register: darwinsu2
-    - name: set darwin_updated var
+    - name: Set darwin_updated var
       ansible.builtin.set_fact:
         upgrade_need_hidsupdate: true
         darwin_updated: true
   when: darwinsu.stderr.find("No new software available.") == -1
 
-- name: reboot?
+- name: Reboot?
   block:
-    - name: mark for reboot
+    - name: Mark for reboot
       ansible.builtin.set_fact:
         upgrade_need_reboot: true
     ## add file marker if play is interrupted

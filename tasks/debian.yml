@@ -13,7 +13,7 @@
   register: pkg_result
   until: pkg_result is success
 
-- name: Debug | var ansible_architecture
+- name: Debug | var ansible_architecture
   ansible.builtin.debug:
     var: ansible_architecture
     verbosity: 1
@@ -54,7 +54,7 @@
   register: aptf
   until: aptf is success
 
-- name: apt | Autoremove unused packages
+- name: Debian | Autoremove unused packages
   ansible.builtin.apt:
     autoremove: yes
   register: aptr
@@ -77,10 +77,10 @@
 
 - name: Ubuntu
   block:
-    - name: check if canonical live patch installed
+    - name: Check if canonical live patch installed
       ansible.builtin.stat: path=/snap/bin/canonical-livepatch
       register: livepatch
-    - name: is canonical live enabled
+    - name: Is canonical live enabled
       ansible.builtin.command: "/snap/bin/canonical-livepatch status"
       register: livepatchstatus
       ignore_errors: true

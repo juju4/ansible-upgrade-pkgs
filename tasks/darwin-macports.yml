@@ -16,7 +16,7 @@
   ansible.builtin.debug: var=darwinmpsu0
   when: (verbose is defined and verbose)
 
-- name: macports update
+- name: Macports update
   block:
     - name: Google Santa | ensure config set to monitor mode
       community.general.osx_defaults:
@@ -34,7 +34,7 @@
     - name: Debug | var darwinmpsu
       ansible.builtin.debug: var=darwinmpsu
       when: (verbose is defined and verbose)
-    - name: set darwin_updated var
+    - name: Set darwin_updated var
       ansible.builtin.set_fact:
         darwin_updated: true
         upgrade_need_hidsupdate: true
@@ -64,7 +64,7 @@
 - name: Debug | var darwinmp
   ansible.builtin.debug: var=darwinmp
   when: (verbose is defined and verbose)
-- name: macports port outdated
+- name: Macports port outdated
   block:
     - name: Google Santa | ensure config set to monitor mode
       community.general.osx_defaults:
@@ -79,7 +79,7 @@
     - name: Darwin | macports port outdated upgrade
       ansible.builtin.command: "/opt/local/bin/port upgrade outdated "  # noqa no-changed-when
       register: darwinmp2
-    - name: set darwin_updated var
+    - name: Set darwin_updated var
       ansible.builtin.set_fact:
         darwin_updated: true
         upgrade_need_hidsupdate: true
@@ -106,19 +106,19 @@
   ansible.builtin.debug: var=darwinmpi
   when: (verbose is defined and verbose)
 ## FIXME! to still allow rollback, would need an inactive minus 1/n back
-- name: macports ports inactive
+- name: Macports ports inactive
   block:
     - name: Darwin | macports uninstall inactive
       ansible.builtin.command: "/opt/local/bin/port uninstall inactive"  # noqa no-changed-when
       register: darwinmpi2
       ignore_errors: true
-    - name: set darwin_updated var
+    - name: Set darwin_updated var
       ansible.builtin.set_fact:
         darwin_updated: true
         upgrade_need_hidsupdate: true
-  when: >
-    darwinmpi.stderr is defined and
-    darwinmpi.stderr.find("None of the specified ports are installed.") == -1 and
-    upgradepkgs_darwinmp_remove_inactive
+  when:
+    - darwinmpi.stderr is defined
+    - darwinmpi.stderr.find("None of the specified ports are installed.") == -1
+    - upgradepkgs_darwinmp_remove_inactive
 
 ## FIXME! port uninstall leaves (~autoremove?)

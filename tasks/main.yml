@@ -5,7 +5,7 @@
 - name: Include specific variables per distribution
   ansible.builtin.include_vars: "{{ ansible_distribution }}.yml"
 
-- name: initialize local variables
+- name: Initialize local variables
   ansible.builtin.set_fact:
     upgrade_need_reboot: false
     upgrade_need_hidsupdate: false

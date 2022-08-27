@@ -3,7 +3,7 @@
 ## Virtualbox guest additions?
 ## https://github.com/BTBurke/skeleton-vagrant-ansible/blob/master/provisioning/vboxadditions.yaml
 
-- name: host | check if Virtualbox installed
+- name: Host | check if Virtualbox installed
   ansible.builtin.stat: path=/usr/bin/virtualbox
   delegate_to: localhost
   register: localvbox
@@ -38,11 +38,11 @@
 - name: Check if /vagrant path is present
   ansible.builtin.stat: path=/vagrant
   register: vagrantdir
-- name: virtualbox guest - vagrant
+- name: Virtualbox guest - vagrant
   ansible.builtin.set_fact:
     isodir: /vagrant/{{ host_v.stdout }}
   when: vagrantdir.stat.exists
-- name: virtualbox guest - generic box
+- name: Virtualbox guest - generic box
   ansible.builtin.set_fact:
     isodir: /tmp/{{ host_v.stdout }}
   when: not vagrantdir.stat.exists
@@ -79,7 +79,7 @@
 - name: Check if harden apt 99security is present
   ansible.builtin.stat: path=/etc/apt/apt.conf.d/99security
   register: hardenapt
-- name: remove immutable tag from /lib directory
+- name: Remove immutable tag from /lib directory
   ansible.builtin.file:
     path: /lib
     state: directory
@@ -102,7 +102,7 @@
   ansible.builtin.command: /sbin/rcvboxdrv setup
   become: yes
   when: virtualbox_host is defined and virtualbox_host
-- name: set immutable tag from /lib directory
+- name: Set immutable tag from /lib directory
   ansible.builtin.file:
     path: /lib
     state: directory
@@ -115,17 +115,7 @@
       (virtualbox_host is defined and virtualbox_host)
     )
 
-    #    - name: Halting the VM since Guest Additions Updated
-    #      local_action: command vagrant halt
-    #      become: no
-    #      when: host_v.stdout != guest_v.stdout
-
-    #    - name: Restarting the VM without provisioning
-    #      local_action: command vagrant up --no-provision
-    #      become: no
-    #      when: host_v.stdout != guest_v.stdout
-
-- name: apt | Mark VM for reboot since Guest Additions Updated
+- name: Debian | Mark VM for reboot since Guest Additions Updated
   ansible.builtin.file:
     path: /var/run/reboot-required
     state: touch
