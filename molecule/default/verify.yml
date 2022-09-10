@@ -24,7 +24,7 @@
             verbosity: 1
         - name: Debian | Ensure update file updated less than a day ago
           ansible.builtin.assert:
-            that: f.stat.exists and f.stat.mtime >=  (ansible_date_time.epoch|int - 3600*24)
+            that: f.stat.exists and f.stat.mtime >=  (ansible_date_time.epoch | int - 3600*24)
           when: False
 
         - name: Check if upgrades still available
@@ -39,4 +39,4 @@
     - name: Check if upgrades still available
       ansible.builtin.command: dnf updateinfo list --security
       register: dnfu
-      when: ansible_os_family == 'RedHat' and ansible_distribution_major_version|int >= 8
+      when: ansible_os_family == 'RedHat' and ansible_distribution_major_version | int >= 8
