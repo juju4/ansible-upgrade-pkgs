@@ -18,7 +18,7 @@ It was tested on the following versions:
 
 ### Operating systems
 
-Ubuntu 14.04, 16.04, 18.04 and Centos7
+Ubuntu 18.04, 20.04, 22.04 and Centos7
 
 ## Example Playbook
 
