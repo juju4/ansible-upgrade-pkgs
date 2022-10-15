@@ -13,6 +13,7 @@
       when: ansible_distribution == 'Ubuntu'
   tasks:
     - name: Debian
+      when: ansible_os_family == 'Debian'
       block:
         - name: Debian | Get update file statistics
           ansible.builtin.stat:
@@ -34,7 +35,6 @@
         - name: Debian | Ensure no new update
           ansible.builtin.assert:
             that: aptu.stdout == 'Listing...' and aptu.rc == 0
-      when: ansible_os_family == 'Debian'
 
     - name: Check if upgrades still available
       ansible.builtin.command: dnf updateinfo list --security

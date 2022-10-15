@@ -1,5 +1,5 @@
 ---
 warn_list:
+  - experimental
   - syntax-check
-  - schema
   - jinja[spacing]

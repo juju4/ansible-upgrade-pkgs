@@ -66,7 +66,9 @@
 
 - name: Debian | Check if a reboot is required
   register: file
-  ansible.builtin.stat: path=/var/run/reboot-required get_md5=no
+  ansible.builtin.stat:
+    path: /var/run/reboot-required
+    get_md5: no
   tags:
     - upgrade
 
@@ -76,9 +78,11 @@
   when: file.stat.exists is defined and file.stat.exists
 
 - name: Ubuntu
+  when: file.stat.exists is defined and file.stat.exists and ansible_distribution == 'Ubuntu'
   block:
     - name: Check if canonical live patch installed
-      ansible.builtin.stat: path=/snap/bin/canonical-livepatch
+      ansible.builtin.stat:
+        path: /snap/bin/canonical-livepatch
       register: livepatch
     - name: Is canonical live enabled
       ansible.builtin.command: "/snap/bin/canonical-livepatch status"
@@ -87,7 +91,8 @@
       changed_when: false
       when: livepatch.stat.exists
     - name: Need to reboot system?
-      ansible.builtin.debug: msg="You will need to reboot system but livepatch is enabled. Do at your leasure :)"
+      ansible.builtin.debug:
+        msg: "You will need to reboot system but livepatch is enabled. Do at your leasure :)"
       when: >
         livepatch.stat.exists and livepatchstatus is defined and
         livepatchstatus.stdout is defined and
@@ -99,7 +104,7 @@
         livepatch.stat.exists and livepatchstatus is defined and
         livepatchstatus.stdout is defined and
         "fully-patched: true" in livepatchstatus.stdout
-  when: file.stat.exists is defined and file.stat.exists and ansible_distribution == 'Ubuntu'
 
 - name: Debug | var upgrade_need_reboot
-  ansible.builtin.debug: var=upgrade_need_reboot
+  ansible.builtin.debug:
+    var: upgrade_need_reboot

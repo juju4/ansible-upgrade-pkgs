@@ -2,22 +2,27 @@
 
 ## assess if aide present and current db
 - name: Linux | ensure aide is installed
-  ansible.builtin.package: name=aide state=present
+  ansible.builtin.package:
+    name: aide
+    state: present
   when: ansible_system == "Linux" and ansible_distribution != 'NA' and ansible_os_family != "Alpine"
   register: pkg_result
   until: pkg_result is success
 - name: Check if aide binary is present
-  ansible.builtin.stat: path={{ aide_bin }}
+  ansible.builtin.stat:
+    path: "{{ aide_bin }}"
   register: hidsaide
   tags:
     - aidehids
 - name: Check if aide current db is present
-  ansible.builtin.stat: path={{ aide_db }}
+  ansible.builtin.stat:
+    path: "{{ aide_db }}"
   register: aidedb
   tags:
     - aidehids
 - name: Check if aide new db is present
-  ansible.builtin.stat: path={{ aide_dbnew }}
+  ansible.builtin.stat:
+    path: "{{ aide_dbnew }}"
   register: aidedbnew
   tags:
     - aidehids
@@ -29,6 +34,7 @@
 # - debug: var=ansible_os_family
 
 - name: Non-Darwin system
+  when: ansible_os_family != "Darwin"
   block:
 
     - name: Non-darwin | update aide database
@@ -57,9 +63,9 @@
       failed_when: false
       tags:
         - aidehids
-  when: ansible_os_family != "Darwin"
 
 - name: Darwin system
+  when: ansible_os_family == "Darwin"
   block:
     - name: Darwin | update aide database
       ansible.builtin.shell: |
@@ -94,4 +100,3 @@
       failed_when: false       # aide -i
       tags:
         - aidehids
-  when: ansible_os_family == "Darwin"

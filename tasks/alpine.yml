@@ -18,4 +18,5 @@
   register: alpout
 
 - name: Alpine upgrade output
-  ansible.builtin.debug: var=alpout
+  ansible.builtin.debug:
+    var: alpout

@@ -7,10 +7,12 @@
   changed_when: false
   ignore_errors: true
 - name: Debug | var darwinsu
-  ansible.builtin.debug: var=darwinsu
+  ansible.builtin.debug:
+    var: darwinsu
   when: (verbose is defined and verbose)
 
 - name: System
+  when: darwinsu.stderr.find("No new software available.") == -1
   block:
     - name: Darwin | system upgrade
       ansible.builtin.shell: "softwareupdate --install --all | tee /tmp/softwareupdate.out"  # noqa no-changed-when
@@ -21,9 +23,9 @@
       ansible.builtin.set_fact:
         upgrade_need_hidsupdate: true
         darwin_updated: true
-  when: darwinsu.stderr.find("No new software available.") == -1
 
 - name: Reboot?
+  when: (darwinsu2.stdout is defined and darwinsu2.stdout.find("Please restart immediately") != -1)
   block:
     - name: Mark for reboot
       ansible.builtin.set_fact:
@@ -34,6 +36,6 @@
         dest: /tmp/ansible-SYSTEM_NEED_REBOOT
         state: touch
         mode: '0600'
-  when: (darwinsu2.stdout is defined and darwinsu2.stdout.find("Please restart immediately") != -1)
 
-- import_tasks: darwin-macports.yml
+- name: Import darwin-macports
+  ansible.builtin.import_tasks: darwin-macports.yml

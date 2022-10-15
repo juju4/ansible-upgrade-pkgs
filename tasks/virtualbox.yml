@@ -4,7 +4,8 @@
 ## https://github.com/BTBurke/skeleton-vagrant-ansible/blob/master/provisioning/vboxadditions.yaml
 
 - name: Host | check if Virtualbox installed
-  ansible.builtin.stat: path=/usr/bin/virtualbox
+  ansible.builtin.stat:
+    path: /usr/bin/virtualbox
   delegate_to: localhost
   register: localvbox
   become: no
@@ -30,13 +31,16 @@
   changed_when: False
 
 - name: Debug | var host_v
-  ansible.builtin.debug: var=host_v
+  ansible.builtin.debug:
+    var: host_v
   when: (verbose is defined and verbose)
 - name: Debug | var guest_v
-  ansible.builtin.debug: var=guest_v
+  ansible.builtin.debug:
+    var: guest_v
   when: (verbose is defined and verbose)
 - name: Check if /vagrant path is present
-  ansible.builtin.stat: path=/vagrant
+  ansible.builtin.stat:
+    path: /vagrant
   register: vagrantdir
 - name: Virtualbox guest - vagrant
   ansible.builtin.set_fact:
@@ -47,7 +51,8 @@
     isodir: /tmp/{{ host_v.stdout }}
   when: not vagrantdir.stat.exists
 - name: Check if Guest Additions iso is present
-  ansible.builtin.stat: path="/{{ isodir }}/VBoxGuestAdditions_{{ host_v.stdout }}.iso"
+  ansible.builtin.stat:
+    path: "/{{ isodir }}/VBoxGuestAdditions_{{ host_v.stdout }}.iso"
   register: vboxguestadditions
   when: host_v.stdout is defined
 - name: Download Guest Additions Installer (when required)
@@ -65,7 +70,7 @@
   register: vboxguestadditions
   when: host_v.stdout is defined
 - name: Mount Guest Additions .iso (when required)
-  mount:
+  ansible.posix.mount:
     name: /mnt
     src: "/{{ isodir }}/VBoxGuestAdditions_{{ host_v.stdout }}.iso"
     opts: loop,ro
@@ -77,7 +82,8 @@
 
 ## as role/harden protection
 - name: Check if harden apt 99security is present
-  ansible.builtin.stat: path=/etc/apt/apt.conf.d/99security
+  ansible.builtin.stat:
+    path: /etc/apt/apt.conf.d/99security
   register: hardenapt
 - name: Remove immutable tag from /lib directory
   ansible.builtin.file:

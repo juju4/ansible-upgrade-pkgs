@@ -13,10 +13,12 @@
   async: 1800
   poll: 180
 - name: Debug | var darwinmpsu0
-  ansible.builtin.debug: var=darwinmpsu0
+  ansible.builtin.debug:
+    var: darwinmpsu0
   when: (verbose is defined and verbose)
 
 - name: Macports update
+  when: (darwinmpsu0.stdout.find("MacPorts base is already the latest version") == -1)
   block:
     - name: Google Santa | ensure config set to monitor mode
       community.general.osx_defaults:
@@ -32,13 +34,13 @@
       ansible.builtin.command: "/opt/local/bin/port selfupdate"  # noqa no-changed-when
       register: darwinmpsu
     - name: Debug | var darwinmpsu
-      ansible.builtin.debug: var=darwinmpsu
+      ansible.builtin.debug:
+        var: darwinmpsu
       when: (verbose is defined and verbose)
     - name: Set darwin_updated var
       ansible.builtin.set_fact:
         darwin_updated: true
         upgrade_need_hidsupdate: true
-  when: (darwinmpsu0.stdout.find("MacPorts base is already the latest version") == -1)
   always:
     - name: Google Santa | ensure config set to lockdown mode
       community.general.osx_defaults:
@@ -62,9 +64,11 @@
   ignore_errors: true
   changed_when: false
 - name: Debug | var darwinmp
-  ansible.builtin.debug: var=darwinmp
+  ansible.builtin.debug:
+    var: darwinmp
   when: (verbose is defined and verbose)
 - name: Macports port outdated
+  when: not ("No installed ports are outdated." in darwinmp.stdout)
   block:
     - name: Google Santa | ensure config set to monitor mode
       community.general.osx_defaults:
@@ -83,7 +87,6 @@
       ansible.builtin.set_fact:
         darwin_updated: true
         upgrade_need_hidsupdate: true
-  when: not ("No installed ports are outdated." in darwinmp.stdout)
   always:
     - name: Google Santa | ensure config set to lockdown mode
       community.general.osx_defaults:
@@ -103,10 +106,15 @@
   changed_when: false
 
 - name: Debug | var darwinmpi
-  ansible.builtin.debug: var=darwinmpi
+  ansible.builtin.debug:
+    var: darwinmpi
   when: (verbose is defined and verbose)
 ## FIXME! to still allow rollback, would need an inactive minus 1/n back
 - name: Macports ports inactive
+  when:
+    - darwinmpi.stderr is defined
+    - darwinmpi.stderr.find("None of the specified ports are installed.") == -1
+    - upgradepkgs_darwinmp_remove_inactive
   block:
     - name: Darwin | macports uninstall inactive
       ansible.builtin.command: "/opt/local/bin/port uninstall inactive"  # noqa no-changed-when
@@ -116,9 +124,5 @@
       ansible.builtin.set_fact:
         darwin_updated: true
         upgrade_need_hidsupdate: true
-  when:
-    - darwinmpi.stderr is defined
-    - darwinmpi.stderr.find("None of the specified ports are installed.") == -1
-    - upgradepkgs_darwinmp_remove_inactive
 
 ## FIXME! port uninstall leaves (~autoremove?)
