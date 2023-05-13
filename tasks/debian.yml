@@ -92,7 +92,7 @@
       when: livepatch.stat.exists
     - name: Need to reboot system?
       ansible.builtin.debug:
-        msg: "You will need to reboot system but livepatch is enabled. Do at your leasure :)"
+        msg: "You will need to reboot system but livepatch is enabled. Do at your leisure :)"
       when: >
         livepatch.stat.exists and livepatchstatus is defined and
         livepatchstatus.stdout is defined and
