@@ -22,9 +22,10 @@
   changed_when: False
 
 - name: Find Guest Additions Version
-  ansible.builtin.shell: |
-    set -o pipefail
-    modinfo vboxguest | awk '/^version:/ { print $2 }'
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      modinfo vboxguest | awk '/^version:/ { print $2 }'
   args:
     executable: /bin/bash
   register: guest_v
@@ -98,14 +99,16 @@
       (virtualbox_host is defined and virtualbox_host)
     )
 - name: Install Guest Additions (when required)
-  ansible.builtin.command: /mnt/VBoxLinuxAdditions.run --nox11 -- --force
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: /mnt/VBoxLinuxAdditions.run --nox11 -- --force
   when: >
     host_v is defined and host_v.stdout and guest_v is defined and guest_v.stdout and
     host_v.stdout != guest_v.stdout
   become: yes
   failed_when: false  # Need to ignore errors here because no windowing system is installed on server image.  No way to override.
 - name: Ensure virtualbox module is build for latest kernel
-  ansible.builtin.command: /sbin/rcvboxdrv setup
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: /sbin/rcvboxdrv setup
   become: yes
   when: virtualbox_host is defined and virtualbox_host
 - name: Set immutable tag from /lib directory

@@ -1,7 +1,8 @@
 ---
 
-- hosts: all
+- name: Test integration playbook
+  hosts: all
   vars:
-    - noreboot_all: true
+    noreboot_all: true
   roles:
     - juju4.upgrade_pkgs

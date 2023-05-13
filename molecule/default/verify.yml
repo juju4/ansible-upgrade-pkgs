@@ -29,7 +29,8 @@
           when: False
 
         - name: Check if upgrades still available
-          ansible.builtin.command: apt list --upgradable
+          ansible.builtin.command:  # noqa no-changed-when
+            cmd: apt list --upgradable
           changed_when: false
           register: aptu
         - name: Debian | Ensure no new update
@@ -37,6 +38,7 @@
             that: aptu.stdout == 'Listing...' and aptu.rc == 0
 
     - name: Check if upgrades still available
-      ansible.builtin.command: dnf updateinfo list --security
+      ansible.builtin.command:  # noqa no-changed-when
+        cmd: dnf updateinfo list --security
       register: dnfu
       when: ansible_os_family == 'RedHat' and ansible_distribution_major_version | int >= 8

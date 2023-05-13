@@ -1,5 +1,4 @@
 ---
 warn_list:
   - experimental
-  - syntax-check
   - jinja[spacing]

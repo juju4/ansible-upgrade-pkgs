@@ -15,7 +15,12 @@
   when: darwinsu.stderr.find("No new software available.") == -1
   block:
     - name: Darwin | system upgrade
-      ansible.builtin.shell: "softwareupdate --install --all | tee /tmp/softwareupdate.out"  # noqa no-changed-when
+      ansible.builtin.shell:  # noqa no-changed-when
+        cmd:
+          set -o pipefail
+          softwareupdate --install --all | tee /tmp/softwareupdate.out
+      args:
+        executable: /bin/bash
       async: 3600
       poll: 180
       register: darwinsu2
