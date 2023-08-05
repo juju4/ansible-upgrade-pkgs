@@ -2,3 +2,5 @@
 warn_list:
   - experimental
   - jinja[spacing]
+exclude_paths:
+  - .github/workflows/galaxy.yml
