@@ -81,7 +81,7 @@ jobs:
       - name: On failure
         run: |
           systemctl -l --no-pager status
-        if: matrix.distribution != 'macos' and env.WORKFLOW_CONCLUSION == 'failure'  # notify only if failure
+        if: matrix.distribution != 'macos' && env.WORKFLOW_CONCLUSION == 'failure'  # notify only if failure
       - name: After script - systemctl
         run: |
           systemd-analyze security || true
@@ -93,5 +93,5 @@ jobs:
           set -x
           port outdated || true
           brew outdated || true
-        if: matrix.distribution == 'macos' and ${{ always() }}
+        if: matrix.distribution == 'macos' && ${{ always() }}
         continue-on-error: true
