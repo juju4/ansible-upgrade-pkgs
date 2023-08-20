@@ -10,7 +10,6 @@
   vars:
     noreboot_all: true
     upgrade_aidedb_update: false
-    darwin_use_homebrew: true
   pre_tasks:
     - name: Ubuntu | Install python3
       ansible.builtin.raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3-minimal)
