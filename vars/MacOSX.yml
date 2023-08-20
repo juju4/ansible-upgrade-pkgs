@@ -1,0 +1,5 @@
+---
+
+aide_bin: '/opt/local/bin/aide'
+aide_db: '/opt/local/var/lib/aide/aide.db'
+aide_dbnew: "/opt/local/var/lib/aide/aide.db.new"
