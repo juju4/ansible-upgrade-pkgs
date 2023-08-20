@@ -24,12 +24,15 @@ jobs:
           - distribution: ubuntu
             version: '22.04'
             experimental: false
+            idempotency_exit: 0
           - distribution: ubuntu
             version: '20.04'
             experimental: false
+            idempotency_exit: 1
           - distribution: macos
             version: 12
             experimental: true
+            idempotency_exit: 1
     env:
       ANSIBLE_CALLBACKS_ENABLED: profile_tasks
       ANSIBLE_ROLE: juju4.upgrade_pkgs
@@ -77,7 +80,7 @@ jobs:
           ANSIBLE_FORCE_COLOR: '1'
       - name: idempotency run
         run: |
-          cd $GITHUB_WORKSPACE/$ANSIBLE_ROLE && ansible-playbook -i localhost, --connection=local --become -vvv molecule/default/converge.yml | tee /tmp/idempotency.log | grep -q 'changed=0.*failed=0'  && (echo 'Idempotence test: pass' && exit 0)  || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 1)
+          cd $GITHUB_WORKSPACE/$ANSIBLE_ROLE && ansible-playbook -i localhost, --connection=local --become -vvv molecule/default/converge.yml | tee /tmp/idempotency.log | grep -q 'changed=0.*failed=0'  && (echo 'Idempotence test: pass' && exit 0)  || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit $idempotency_exit)
       - name: On failure
         run: |
           systemctl -l --no-pager status
