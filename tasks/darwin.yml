@@ -45,3 +45,7 @@
 - name: Import darwin-macports
   ansible.builtin.import_tasks: darwin-macports.yml
   when: ( darwin_use_macports is defined and darwin_use_macports|bool)
+
+- name: Import darwin-brew
+  ansible.builtin.import_tasks: darwin-brew.yml
+  when: darwin_use_homebrew is defined and darwin_use_homebrew|bool

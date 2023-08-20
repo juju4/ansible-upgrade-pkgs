@@ -1,0 +1,18 @@
+---
+
+- name: Install Homebrew/bundle
+  community.general.homebrew:
+    name: Homebrew/bundle
+    state: present
+
+- name: Backup current brew list
+  ansible.builtin.command:
+    cmd: "brew bundle list --file Brewfile.{{ ansible_date_time.date }}"
+  args:
+    chdir: /var/private/tmp
+    creates: "/var/private/tmp/Brewfile.{{ ansible_date_time.date }}"
+
+- name: Update homebrew and upgrade all packages
+  community.general.homebrew:
+    update_homebrew: true
+    upgrade_all: true

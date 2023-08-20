@@ -24,3 +24,4 @@ harden_darwin_santa_db_type: string
 harden_darwin_santa_mode: 1
 
 darwin_use_macports: false
+darwin_use_homebrew: false
