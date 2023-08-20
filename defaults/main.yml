@@ -21,3 +21,5 @@ upgradepkgs_darwin_santa_temporary_monitor: true
 
 harden_darwin_santa_db_type: string
 # harden_darwin_santa_db_type: int
+
+darwin_use_macports: false
