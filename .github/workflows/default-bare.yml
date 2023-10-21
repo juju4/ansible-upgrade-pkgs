@@ -62,6 +62,12 @@ jobs:
           cd $GITHUB_WORKSPACE/$ANSIBLE_ROLE
           [ -f get-dependencies.sh ] && sh -x get-dependencies.sh
           { echo '[defaults]'; echo 'callbacks_enabled = profile_tasks, timer'; echo 'roles_path = ../'; echo 'ansible_python_interpreter: /usr/bin/python3'; } >> ansible.cfg
+      - name: Workaround grub-efi-amd64-signed
+        # https://github.com/orgs/community/discussions/47863
+        # https://github.com/actions/runner-images/issues/7192
+        run: |
+          echo RESET grub-efi/install_devices | debconf-communicate grub-pc
+        if: matrix.distribution == 'ubuntu'
       - name: Environment
         run: |
           pwd
