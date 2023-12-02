@@ -68,7 +68,7 @@
   register: file
   ansible.builtin.stat:
     path: /var/run/reboot-required
-    get_md5: no
+    get_checksum: no
   tags:
     - upgrade
 
