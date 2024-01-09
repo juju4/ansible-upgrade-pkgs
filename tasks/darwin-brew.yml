@@ -1,10 +1,4 @@
 ---
-
-- name: Install Homebrew/bundle
-  community.general.homebrew:
-    name: Homebrew/bundle
-    state: present
-
 - name: Backup current brew list
   ansible.builtin.command:
     cmd: "brew bundle list --file Brewfile.{{ ansible_date_time.date }}"
