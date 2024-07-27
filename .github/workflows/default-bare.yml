@@ -22,6 +22,10 @@ jobs:
       matrix:
         include:
           - distribution: ubuntu
+            version: '24.04'
+            experimental: false
+            idempotency_exit: 0
+          - distribution: ubuntu
             version: '22.04'
             experimental: false
             idempotency_exit: 0
