@@ -44,20 +44,46 @@
 ## = dist is not enough...
 ## Note: some upgrade can fail if /run is full/too small.
 ##      => mount -o remount,size=200m /run
-- name: Debian | upgrade all packages to the latest version (full)
-  ansible.builtin.apt:
-    upgrade: full
-  tags:
-    - upgrade
-  async: 3600
-  poll: 180
-  register: aptf
-  until: aptf is success
+- name: Upgrade
+  block:
+    - name: Debian | upgrade all packages to the latest version (full)
+      ansible.builtin.apt:
+        upgrade: full
+      tags:
+        - upgrade
+      async: 3600
+      poll: 180
+      register: aptf
+      until: aptf is success
 
-- name: Debian | Autoremove unused packages
-  ansible.builtin.apt:
-    autoremove: yes
-  register: aptr
+    - name: Debian | Autoremove unused packages
+      ansible.builtin.apt:
+        autoremove: yes
+      register: aptr
+  rescue:
+    - name: Include immutable
+      ansible.builtin.include_tasks: immutable.yml
+      vars:
+        target_dir: /lib/systemd/system
+        state: pre
+    - name: Debian | upgrade all packages to the latest version (full) 2
+      ansible.builtin.apt:
+        upgrade: full
+      tags:
+        - upgrade
+      async: 3600
+      poll: 180
+      register: aptf
+      until: aptf is success
+    - name: Debian | Autoremove unused packages 2
+      ansible.builtin.apt:
+        autoremove: yes
+      register: aptr
+    - name: Include immutable
+      ansible.builtin.include_tasks: immutable.yml
+      vars:
+        target_dir: /lib/systemd/system
+        state: post
 
 - name: Need HIDS update
   ansible.builtin.set_fact:  # noqa no-handler
