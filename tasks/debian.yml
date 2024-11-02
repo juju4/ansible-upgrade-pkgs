@@ -40,6 +40,12 @@
     - ansible_architecture != 'armv6l'
 
 # fixme: merge with cron.daily check in playbook
+- name: Debian | ensure procps package is present
+  ansible.builtin.apt:
+    name: procps
+    state: present
+  register: pkg_result
+  until: pkg_result is success
 - name: Debian | Ensure no conflicting process running
   ansible.builtin.command: ps aux
   register: ps
