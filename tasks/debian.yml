@@ -39,6 +39,25 @@
     - ansible_architecture != 'armv7l'
     - ansible_architecture != 'armv6l'
 
+# fixme: merge with cron.daily check in playbook
+- name: Debian | Ensure no conflicting process running
+  ansible.builtin.command: ps aux
+  register: ps
+  changed_when: False
+
+- name: Debian | Conflict
+  when:
+    - '"/usr/lib/apt/apt.systemd.daily " in ps.stdout'
+  block:
+    - name: Debian | Get process age
+      ansible.builtin.set_fact:
+        # root     64256  0.0  0.0   2892     0 ?        Ss   Aug03   0:00 /bin/sh /usr/lib/apt/apt.systemd.daily update
+        ps_age: "{{ ps.stdout | regex_search(' ([A-Z][a-z][a-z][0-9]+)\\s+[0-9]+:[0-9]+\\s+\/bin\/sh \/usr\/lib\/apt\/apt.systemd.daily ', '\\1', multiline=True, ignorecase=True) }}"
+
+    - name: Debian | Conflicting process
+      ansible.builtin.fail:
+        msg: "A conflicting process is running (age: {{ ps_age | first }}). Retry later."
+
 ## https://github.com/ansible/ansible/issues/11601
 ## https://github.com/ansible/ansible-modules-core/issues/1741
 ## = dist is not enough...
