@@ -34,7 +34,7 @@ jobs:
             experimental: false
             idempotency_exit: 1
           - distribution: macos
-            version: 12
+            version: latest
             experimental: true
             idempotency_exit: 1
     env:
