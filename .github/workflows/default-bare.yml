@@ -29,10 +29,6 @@ jobs:
             version: '22.04'
             experimental: false
             idempotency_exit: 0
-          - distribution: ubuntu
-            version: '20.04'
-            experimental: false
-            idempotency_exit: 1
           - distribution: macos
             version: latest
             experimental: true
