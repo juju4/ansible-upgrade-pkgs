@@ -30,6 +30,14 @@
   ansible.builtin.import_tasks: openbsd.yml
   when: ansible_os_family == 'OpenBSD'
 
+- name: Check if snapd is present
+  ansible.builtin.stat:
+    path: /var/lib/snapd
+  register: has_snapd
+- name: Import snapd
+  ansible.builtin.import_tasks: snapd.yml
+  when: has_snapd.stat.exists
+
 - name: Import aide-hids
   ansible.builtin.import_tasks: aide-hids.yml
   when: (upgrade_need_hidsupdate and upgrade_aidedb_update) or (upgrade_forceaide is defined and upgrade_forceaide)

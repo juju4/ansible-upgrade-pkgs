@@ -1,0 +1,6 @@
+---
+
+- name: Set snapd refresh timer
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: snap set system refresh.timer={{ upgrade_pkgs_snap_refresh_timer }}
+  become: true

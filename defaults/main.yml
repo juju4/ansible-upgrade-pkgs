@@ -9,6 +9,9 @@ noreboot_all: false
 vboxguest:  # list VM
   vm1: true
 
+# https://snapcraft.io/docs/managing-updates
+upgrade_pkgs_snap_refresh_timer: 'mon,fri,10:00,15:00'
+
 upgrade_aidedb_update: true
 upgrade_forceaide: false
 upgrade_aidedb_rotate: 7
