@@ -88,6 +88,14 @@
         autoremove: yes
       register: aptr
   rescue:
+    - name: Ensure dpkg was not interrupted
+      ansible.builtin.command:
+        cmd: dpkg --configure -a
+      register: dpkgca
+      changed_when: dpkgca.stdout | length > 0
+    - name: Ensure no broken packages
+      ansible.builtin.apt:
+        state: fixed
     - name: Include immutable
       ansible.builtin.include_tasks: immutable.yml
       vars:
