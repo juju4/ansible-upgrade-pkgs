@@ -31,11 +31,6 @@ jobs:
             suite: default
             experimental: false
             idempotency_exit: 0
-          - distribution: ubuntu
-            version: '22.04'
-            suite: default
-            experimental: false
-            idempotency_exit: 0
           - distribution: macos
             version: latest
             suite: default
