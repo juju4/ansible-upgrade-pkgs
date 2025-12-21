@@ -35,7 +35,7 @@ jobs:
             version: latest
             suite: default
             experimental: true
-            idempotency_exit: 1
+            idempotency_exit: 0
     env:
       ANSIBLE_CALLBACKS_ENABLED: profile_tasks
       ANSIBLE_EXTRA_VARS: ""
