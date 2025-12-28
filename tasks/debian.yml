@@ -13,9 +13,9 @@
   register: pkg_result
   until: pkg_result is success
 
-- name: Debug | var ansible_architecture
+- name: Debug | var ansible_facts['architecture']
   ansible.builtin.debug:
-    var: ansible_architecture
+    var: ansible_facts['architecture']
     verbosity: 1
 
 - name: Debian | ensure update-notifier-common package is present
@@ -25,8 +25,8 @@
   register: pkg_result
   until: pkg_result is success
   when:
-    - ansible_architecture != 'armv7l'
-    - ansible_architecture != 'armv6l'
+    - ansible_facts['architecture'] != 'armv7l'
+    - ansible_facts['architecture'] != 'armv6l'
 
 ## FIXME! http://askubuntu.com/questions/441921/why-does-usr-lib-update-notifier-apt-check-not-agree-with-apt-get-upgrade
 - name: Debian | Check if there are packages available to be installed/upgraded
@@ -36,8 +36,8 @@
   tags:
     - upgrade
   when:
-    - ansible_architecture != 'armv7l'
-    - ansible_architecture != 'armv6l'
+    - ansible_facts['architecture'] != 'armv7l'
+    - ansible_facts['architecture'] != 'armv6l'
 
 # fixme: merge with cron.daily check in playbook
 - name: Debian | ensure procps package is present
@@ -149,7 +149,7 @@
   when: file.stat.exists is defined and file.stat.exists
 
 - name: Ubuntu
-  when: file.stat.exists is defined and file.stat.exists and ansible_distribution == 'Ubuntu'
+  when: file.stat.exists is defined and file.stat.exists and ansible_facts['distribution'] == 'Ubuntu'
   block:
     - name: Check if canonical live patch installed
       ansible.builtin.stat:

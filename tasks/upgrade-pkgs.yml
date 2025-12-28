@@ -5,7 +5,7 @@
   ansible.builtin.set_fact:
     virtualbox_host: true
   when:
-    - ansible_system == "Linux"
+    - ansible_facts['system'] == "Linux"
     - packages is defined
     - packages.stdout is defined
     - packages.stdout.find("virtualbox-") != -1
@@ -38,6 +38,6 @@
   when: >
     (file.stat.exists is defined and file.stat.exists | bool and
       (not noreboot or noreboot[inventory_hostname] is not defined)
-    ) or (ansible_os_family == "Darwin" and
+    ) or (ansible_facts['os_family'] == "Darwin" and
       (darwinsu2.stdout is defined and darwinsu2.stdout.find("Please restart immediately") != -1)
     )

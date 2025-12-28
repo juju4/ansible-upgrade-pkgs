@@ -4,7 +4,7 @@
 ## FIXME! not supported
 # - name: Darwin | macports upgrade
 #   macports: name=* present=latest
-#   when: ansible_os_family == "Darwin"
+#   when: ansible_facts['os_family'] == "Darwin"
 - name: Darwin | macports port selfupdate dryrun
   ansible.builtin.command: "/opt/local/bin/port -yv selfupdate --nosync"
   register: darwinmpsu0

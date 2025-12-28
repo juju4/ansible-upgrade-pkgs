@@ -5,7 +5,7 @@
   ansible.builtin.package:
     name: aide
     state: present
-  when: ansible_system == "Linux" and ansible_distribution != 'NA' and ansible_os_family != "Alpine"
+  when: ansible_facts['system'] == "Linux" and ansible_facts['distribution'] != 'NA' and ansible_facts['os_family'] != "Alpine"
   register: pkg_result
   until: pkg_result is success
 - name: Check if aide binary is present
@@ -32,10 +32,10 @@
   ansible.builtin.command:  # noqa no-changed-when
     cmd: "mv {{ aide_dbnew }} {{ aide_db }}"
   when: hidsaide.stat.exists and not aidedb.stat.exists and aidedbnew.stat.exists
-# - debug: var=ansible_os_family
+# - debug: var=ansible_facts['os_family']
 
 - name: Non-Darwin system
-  when: ansible_os_family != "Darwin"
+  when: ansible_facts['os_family'] != "Darwin"
   block:
 
     - name: Non-darwin | update aide database
@@ -68,7 +68,7 @@
         - aidehids
 
 - name: Darwin system
-  when: ansible_os_family == "Darwin"
+  when: ansible_facts['os_family'] == "Darwin"
   block:
     - name: Darwin | update aide database
       ansible.builtin.shell:  # noqa no-changed-when
@@ -88,7 +88,7 @@
         executable: /bin/bash
       when: >
         hidsaide.stat.exists and (aidedb.stat.exists or aidedbnew.stat.exists) and
-        ansible_os_family == "Darwin" and darwin_updated is defined and darwin_updated
+        ansible_facts['os_family'] == "Darwin" and darwin_updated is defined and darwin_updated
       failed_when: false
       async: 3600
       poll: 180

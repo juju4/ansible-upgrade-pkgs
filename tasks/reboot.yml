@@ -3,7 +3,7 @@
 - name: Lxc containers | restart from host
   ansible.builtin.debug:
     msg: "You will need to reboot system. restart from container host."
-  when: ansible_virtualization_type == 'lxc'
+  when: ansible_facts['virtualization_type'] == 'lxc'
 
 - name: Need to reboot system but asked not
   ansible.builtin.debug:
@@ -11,11 +11,11 @@
   when: noreboot is defined and noreboot[inventory_hostname] is defined and noreboot[inventory_hostname]
 
 # - debug: var="{{ not (noreboot is defined and noreboot[inventory_hostname] is defined and
-#               noreboot[inventory_hostname]) and ansible_virtualization_type != 'lxc' }}"
+#               noreboot[inventory_hostname]) and ansible_facts['virtualization_type'] != 'lxc' }}"
 - name: Reboot
   when: >
     not (noreboot is defined and noreboot[inventory_hostname] is defined and noreboot[inventory_hostname]) and
-    ansible_virtualization_type != 'lxc'
+    ansible_facts['virtualization_type'] != 'lxc'
   block:
     - name: Reboot system
       ansible.builtin.reboot:

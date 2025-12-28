@@ -130,6 +130,6 @@
     state: touch
     mode: '0644'
   when: >
-    (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and
+    (ansible_facts['distribution'] == 'Debian' or ansible_facts['distribution'] == 'Ubuntu') and
     host_v is defined and host_v.stdout and
     guest_v.stdout and host_v.stdout != guest_v.stdout
