@@ -1,9 +1,17 @@
 ---
 
-- name: Include specific variables per other os family
-  ansible.builtin.include_vars: "{{ ansible_facts['os_family'] }}.yml"
-- name: Include specific variables per distribution
-  ansible.builtin.include_vars: "{{ ansible_facts['distribution'] }}.yml"
+- name: Include variables
+  ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+        - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+        - "{{ ansible_facts['distribution'] }}.yml"
+        - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+        - "{{ ansible_facts['os_family'] }}.yml"
+      paths:
+        - 'vars'
 
 - name: Initialize local variables
   ansible.builtin.set_fact:
