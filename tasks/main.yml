@@ -18,6 +18,14 @@
     upgrade_need_reboot: false
     upgrade_need_hidsupdate: false
 
+- name: Import proxmox
+  ansible.builtin.import_tasks: proxmox.yml
+  when:
+    - upgradepkgs_proxmox_snap_enable | bool
+    - hostvars[inventory_hostname].vmid is defined
+    - upgradepkgs_proxmox_api_user | length > 0
+    - upgradepkgs_proxmox_api_password | length > 0
+
 - name: Import debian
   ansible.builtin.import_tasks: debian.yml
   when: ansible_facts['os_family'] == 'Debian'

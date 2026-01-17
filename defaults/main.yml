@@ -28,3 +28,10 @@ harden_darwin_santa_mode: 1
 
 darwin_use_macports: false
 darwin_use_homebrew: false
+
+# proxmox snapshots?
+# vmid and pve(api_host) should be defined in inventory
+upgradepkgs_proxmox_snap_enable: false
+upgradepkgs_proxmox_api_user: 'api@proxmox'
+upgradepkgs_proxmox_api_password: ''
+upgradepkgs_proxmox_snap_retention: 3
