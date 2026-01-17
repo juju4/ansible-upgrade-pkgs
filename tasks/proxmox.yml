@@ -7,7 +7,7 @@
       - python3-pip
       - python3-venv
   become: true
-  delegate_to: "{{ hostvars[inventory_hostname].pve }}"
+  delegate_to: "{{ hostvars[inventory_hostname].pve | default(omit) }}"
 
 - name: Install proxmoxer and requests
   ansible.builtin.pip:
@@ -18,23 +18,23 @@
     virtualenv_command: "{{ ansible_python.executable }} -m venv"
   become: true
   environment: "{{ proxy_env | default(omit) }}"
-  delegate_to: "{{ hostvars[inventory_hostname].pve }}"
+  delegate_to: "{{ hostvars[inventory_hostname].pve | default(omit) }}"
 
 - name: Use special Python to be able to use community.proxmox modules
   ansible.builtin.set_fact:
     ansible_python_interpreter_proxmoxer: >-
       /usr/lib/python-just-for-use-with-ansible-and-proxmox/bin/python3
-  delegate_to: "{{ hostvars[inventory_hostname].pve }}"
+  delegate_to: "{{ hostvars[inventory_hostname].pve | default(omit) }}"
 
 - name: Create new container snapshot
   community.proxmox.proxmox_snap:
     api_user: "{{ upgradepkgs_proxmox_api_user }}"
     api_password: "{{ upgradepkgs_proxmox_api_password }}"
-    api_host: "{{ hostvars[inventory_hostname].pve }}"
-    vmid: "{{ hostvars[inventory_hostname].vmid }}"
+    api_host: "{{ hostvars[inventory_hostname].pve | default(omit) }}"
+    vmid: "{{ hostvars[inventory_hostname].vmid | default(omit) }}"
     state: present
     snapname: "upgradepkgs-{{ ansible_facts.date_time.year }}{{ ansible_facts.date_time.month }}{{ ansible_facts.date_time.day }}"
     retention: "{{ upgradepkgs_proxmox_snap_retention }}"
-  delegate_to: "{{ hostvars[inventory_hostname].pve }}"
+  delegate_to: "{{ hostvars[inventory_hostname].pve | default(omit) }}"
   vars:
     ansible_python_interpreter: "{{ ansible_python_interpreter_proxmoxer | default(omit) }}"
