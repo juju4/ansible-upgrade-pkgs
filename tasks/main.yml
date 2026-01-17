@@ -23,6 +23,7 @@
   when:
     - upgradepkgs_proxmox_snap_enable | bool
     - hostvars[inventory_hostname].vmid is defined
+    - hostvars[inventory_hostname].pve is defined
     - upgradepkgs_proxmox_api_user | length > 0
     - upgradepkgs_proxmox_api_password | length > 0
 
