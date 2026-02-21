@@ -47,7 +47,12 @@
   register: pkg_result
   until: pkg_result is success
 - name: Debian | Ensure no conflicting process running
-  ansible.builtin.command: ps aux
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      ps -eo pid,user,cgroup,args | grep -vE "\/lxc|\/lxd"
+  args:
+    executable: /bin/bash
   register: ps
   changed_when: False
 
