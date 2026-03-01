@@ -1,0 +1,10 @@
+---
+
+# ansible module has no snapshot option
+#
+- name: Create new incus snapshot
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: |
+      incus snapshot create {{ ansible_facts.hostname }} upgradepkgs-{{ ansible_facts.date_time.year }}{{ ansible_facts.date_time.month }}{{ ansible_facts.date_time.day }} --expiry {{ upgradepkgs_incus_expiry }}
+  become: true
+  delegate_to: "{{ hostvars[inventory_hostname].incushost | default(omit) }}"

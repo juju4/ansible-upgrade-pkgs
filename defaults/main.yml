@@ -35,3 +35,7 @@ upgradepkgs_proxmox_snap_enable: false
 upgradepkgs_proxmox_api_user: 'api@proxmox'
 upgradepkgs_proxmox_api_password: ''
 upgradepkgs_proxmox_snap_retention: 3
+# incus snapshot
+# incushost should be defined in inventory or guest variables
+upgradepkgs_incus_snap_enable: false
+upgradepkgs_incus_expiry: 4w

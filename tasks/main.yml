@@ -18,6 +18,12 @@
     upgrade_need_reboot: false
     upgrade_need_hidsupdate: false
 
+- name: Import incus
+  ansible.builtin.import_tasks: incus.yml
+  when:
+    - upgradepkgs_incus_snap_enable | bool
+    - hostvars[inventory_hostname].incushost is defined
+
 - name: Import proxmox
   ansible.builtin.import_tasks: proxmox.yml
   when:
