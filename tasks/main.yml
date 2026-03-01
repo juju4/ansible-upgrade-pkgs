@@ -35,6 +35,13 @@
     - upgradepkgs_proxmox_api_password is defined
     - upgradepkgs_proxmox_api_password | length > 0
 
+- name: Import proxmox-cli
+  ansible.builtin.import_tasks: proxmox-cli.yml
+  when:
+    - upgradepkgs_proxmox_snap_cli_enable | bool
+    - hostvars[inventory_hostname].vmid is defined
+    - hostvars[inventory_hostname].pve is defined
+
 - name: Import debian
   ansible.builtin.import_tasks: debian.yml
   when: ansible_facts['os_family'] == 'Debian'

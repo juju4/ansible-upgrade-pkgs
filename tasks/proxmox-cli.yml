@@ -1,0 +1,8 @@
+---
+
+- name: Create new proxmox snapshot - cli
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: |
+      pct snapshot {{ hostvars[inventory_hostname].vmid }} upgradepkgs-{{ ansible_facts.date_time.year }}{{ ansible_facts.date_time.month }}{{ ansible_facts.date_time.day }} --description {{ ansible_facts.date_time.iso8601 }}
+  become: true
+  delegate_to: "{{ hostvars[inventory_hostname].pve | default(omit) }}"
