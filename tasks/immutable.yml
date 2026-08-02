@@ -2,6 +2,11 @@
 ## manage install when some directories are immutable
 ## requires target_dir, state=pre/post
 
+- name: Ensure e2fsprogs is present
+  ansible.builtin.package:
+    name: e2fsprogs
+    state: present
+
 - name: Pre-change immutable
   when: state == 'pre'
   block:
@@ -10,17 +15,22 @@
       # ansible.builtin.stat:
       #   path: "{{ target_dir }}"
       #   get_attributes: yes
-      ansible.builtin.command: "lsattr -d '{{ target_dir }}'"
+      ansible.builtin.command:  # noqa no-changed-when
+        cmd: "lsattr -d '{{ target_dir }}'"
       register: dir
       changed_when: false
-
-    - name: Remove immutable attribute  # noqa no-changed-when
-      ansible.builtin.command: "chattr -R -i '{{ target_dir }}'"
       failed_when: false
-      when: dir.stdout.find('-i-') != -1
 
-- name: Reestablish immutable attribute  # noqa no-changed-when
-  ansible.builtin.command: "chattr -R +i '{{ target_dir }}'"
+    - name: Remove immutable attribute
+      ansible.builtin.command:  # noqa no-changed-when
+        cmd: "chattr -i '{{ target_dir }}'"
+      when:
+        - dir.rc == 0
+        - dir.stdout.find('-i-') != -1
+
+- name: Reestablish immutable attribute
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: "chattr +i '{{ target_dir }}'"
   # ansible.builtin.file:
   #   dest: "{{ target_dir }}"
   #   attributes: '----i-----I--e--'
