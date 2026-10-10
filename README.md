@@ -1,7 +1,7 @@
+# upgrade-pkgs ansible role
+
 [![Actions Status - Main](https://github.com/juju4/ansible-upgrade-pkgs/workflows/AnsibleCI/badge.svg)](https://github.com/juju4/ansible-upgrade-pkgs/actions?query=branch%3Amain)
 [![Actions Status - Devel](https://github.com/juju4/ansible-upgrade-pkgs/workflows/AnsibleCI/badge.svg?branch=devel)](https://github.com/juju4/ansible-upgrade-pkgs/actions?query=branch%3Adevel)
-
-# upgrade-pkgs ansible role
 
 Ansible role to do upgrade system with packaging system
 Tentative support for Debian and Redhat-based distribution, Alpine Linux, Darwin/Macports, OpenBSD.
