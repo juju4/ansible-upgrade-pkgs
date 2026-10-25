@@ -27,7 +27,7 @@ jobs:
       matrix:
         include:
           - distribution: ubuntu
-            version: '24.04'
+            version: latest
             suite: default
             experimental: false
             idempotency_exit: 0
