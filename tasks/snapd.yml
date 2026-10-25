@@ -4,3 +4,16 @@
   ansible.builtin.command:  # noqa no-changed-when
     cmd: snap set system refresh.timer={{ upgrade_pkgs_snap_refresh_timer }}
   become: true
+
+# https://askubuntu.com/questions/920443/where-can-i-find-snapd-update-or-refresh-logs-how-does-snapd-inform-the-user-ab
+# https://bugs.launchpad.net/ubuntu/+source/snapd/+bug/1695934
+- name: Get snap changes
+  ansible.builtin.command:
+    cmd: snap changes
+  changed_when: false
+  register: snap_changes
+
+- name: Check no error in snap changes
+  ansible.builtin.assert:
+    that:
+      - "'Error' not in snap_changes.stdout"
