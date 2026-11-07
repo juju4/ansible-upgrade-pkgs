@@ -17,3 +17,31 @@
   ansible.builtin.assert:
     that:
       - "'Error' not in snap_changes.stdout"
+
+- name: Snap refresh block
+  block:
+    - name: Snap refresh
+      ansible.builtin.command:  # noqa no-changed-when
+        cmd: snap refresh
+      register: snap_refresh
+    - name: Debug | snap refresh out
+      ansible.builtin.debug:
+        var: snap_refresh
+  rescue:
+    - name: Include immutable
+      ansible.builtin.include_tasks: immutable.yml
+      vars:
+        target_dir: /etc/systemd/system
+        state: pre
+    - name: Snap refresh (immutable)
+      ansible.builtin.command:  # noqa no-changed-when
+        cmd: snap refresh
+      register: snap_refresh
+    - name: Debug | snap refresh out
+      ansible.builtin.debug:
+        var: snap_refresh
+    - name: Include immutable
+      ansible.builtin.include_tasks: immutable.yml
+      vars:
+        target_dir: /etc/systemd/system
+        state: post
